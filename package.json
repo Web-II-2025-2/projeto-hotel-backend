@@ -1,0 +1,24 @@
+{
+  "name": "projeto-hotel-docs",
+  "version": "1.0.0",
+  "description": "Mini teste 1 da cadeira de Web II",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Web-II-2025-2/projeto-hotel-docs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Web-II-2025-2/projeto-hotel-docs/issues"
+  },
+  "homepage": "https://github.com/Web-II-2025-2/projeto-hotel-docs#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
