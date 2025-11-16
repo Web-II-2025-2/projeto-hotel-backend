@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão Hoteleira</title>
+</head>
+<body>
+    <header>
+        <h1>Projeto: Sistema de Gestão Hoteleira</h1>
+        <p>Sistema de gerenciamento focado em automatizar e otimizar as operações diárias de um hotel.</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>Sobre o Projeto</h2>
+            <p>Este projeto é um sistema de gerenciamento focado em automatizar e otimizar as operações diárias de um hotel. A plataforma centraliza desde a reserva de quartos até o fechamento da conta do hóspede, garantindo controle total sobre a logística operacional.</p>
+            <p>O objetivo é criar uma plataforma robusta que reduza o trabalho manual da recepção, otimize a taxa de ocupação através de um controle de inventário preciso e melhore a experiência do hóspede ao agilizar os processos de check-in e check-out.</p>
+        </section>
+
+        <section>
+            <h2>Funcionalidades Principais</h2>
+
+            <article>
+                <h3>1. Módulo: Gerência de quartos</h3>
+                <h4>Funcionalidades:</h4>
+                <ul>
+                    <li><strong>Cadastrar quartos:</strong> O sistema deve permitir o cadastro de quartos e associá-los a um "Tipo de Quarto" e a um valor de diária.</li>
+                    <li><strong>Gerenciamento de Estado:</strong> O sistema deve permitir que um quarto transite por diferentes estados: Disponível, Ocupado, Em Limpeza, Em Manutenção.</li>
+                    <li><strong>Tipos de Quarto:</strong> O sistema deve permitir o cadastro de "Tipos de Quarto" (ex: Standard Casal, Suíte Deluxe) e quantos quartos físicos existem para cada tipo.</li>
+                    <li><strong>Bloqueio de Quarto:</strong> Um funcionário deve poder colocar um quarto em um estado de limpeza ou em manutenção retirando o quarto de ser possível de reservar.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>2. Módulo: Gestão de funcionários</h3>
+                <h4>Objetivo:</h4>
+                <p>Garantir que cada funcionário só acesse o que é responsabilidade da sua função.</p>
+                <h4>Funcionalidades:</h4>
+                <ul>
+                    <li><strong>Cadastro de Funcionários:</strong> O sistema deve permitir o cadastro de usuários e senhas.</li>
+                    <li><strong>Perfis de Acesso (Roles):</strong> O sistema deve ter perfis pré-definidos (ex: Gerente, Recepcionista, Camareira, Restaurante).</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>3. Módulo: Gestão de Hóspedes</h3>
+                <h4>Objetivo:</h4>
+                <p>Manter um histórico e reconhecer clientes recorrentes.</p>
+                <h4>Funcionalidades:</h4>
+                <ul>
+                    <li><strong>Cadastro de Hóspedes:</strong> O sistema deve manter um cadastro de hóspedes, contendo dados pessoais e de contato.</li>
+                    <li><strong>Histórico de Estadias:</strong> O sistema deve associar todas as reservas de um hóspede ao seu cadastro.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>4. Módulo: Reservas</h3>
+                <h4>Objetivo:</h4>
+                <p>Garantir a venda de estadias de forma segura e controlada.</p>
+                <h4>Funcionalidades:</h4>
+                <ul>
+                    <li><strong>Consulta de Disponibilidade:</strong> O sistema deve permitir a consulta de "Tipos de Quarto" disponíveis para um determinado período e número de hóspedes.</li>
+                    <li><strong>Criação de Reserva:</strong> O sistema deve permitir a criação de uma reserva associada a um "Tipo de Quarto" e a um cadastro de Hóspede.</li>
+                    <li><strong>Confirmação/Cancelamento:</strong> O sistema deve confirmar a reserva se o pagamento for bem-sucedido ou liberar a vaga se o tempo expirar ou o pagamento falhar.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>5. Módulo: Gestão de Eventos</h3>
+                <h4>Objetivo:</h4>
+                <p>Gerenciar a reserva de espaços e serviços além dos quartos.</p>
+                <h4>Funcionalidades:</h4>
+                <ul>
+                    <li><strong>Cadastro de Ativos (Eventos):</strong> O sistema deve permitir o cadastro de "Espaços" e "Eventos" (ex: "Projetor", "Coffee Break por pessoa").</li>
+                    <li><strong>Calendário de Eventos:</strong> O sistema deve fornecer uma visão de calendário para a disponibilidade desses "Espaços".</li>
+                    <li><strong>Agendamento de Eventos:</strong> O sistema deve permitir a reserva de um espaço, anexando os serviços necessários.</li>
+                    <li><strong>Notificação de Eventos:</strong> Se for um evento organizado pelo o hotel, o sistema deve notificar os hóspedes a participar.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>6. Módulo: Operações e Limpeza</h3>
+                <h4>Objetivo:</h4>
+                <p>Coordenar a logística de limpeza e preparação dos quartos.</p>
+                <h4>Funcionalidades:</h4>
+                <ul>
+                    <li><strong>Fila de Limpeza Automática:</strong> Quando um hóspede faz check-out, o sistema deve automaticamente mudar o estado do quarto para Disponível Sujo e adicioná-lo à fila de trabalho da equipe de limpeza.</li>
+                    <li><strong>Atualização de Status:</strong> A equipe de limpeza deve poder marcar um quarto como Em Limpeza e, ao finalizar, como Disponível Limpo.</li>
+                </ul>
+            </article>
+        </section>
+
+        <section>
+            <h2>Características de Qualidade</h2>
+
+            <article>
+                <h3>Segurança</h3>
+                <ul>
+                    <li>O sistema irá manipular dados sensíveis de usuários (hóspedes e funcionários).</li>
+                    <li>Deve haver múltiplos níveis de acesso, com um mecanismo de RBAC robusto e bem definido.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>Usabilidade</h3>
+                <ul>
+                    <li>O sistema será utilizado por funcionários com diferentes níveis de conhecimento técnico.</li>
+                    <li>A interface também deve ser intuitiva para os hóspedes, garantindo facilidade de uso e entendimento.</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>Confiabilidade</h3>
+                <ul>
+                    <li>O sistema não pode apresentar falhas durante operações críticas, como check-in e check-out.</li>
+                    <li>Dados financeiros e operacionais não podem ser perdidos, exigindo mecanismos de recuperação e alta disponibilidade.</li>
+                </ul>
+            </article>
+        </section>
+    </main>
+</body>
+</html>
