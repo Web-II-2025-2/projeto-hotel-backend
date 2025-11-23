@@ -1,9 +1,9 @@
- declare module "swagger-jsdoc" {
-
+declare module "swagger-jsdoc" {
   interface Options {
     definition: object;
     apis: string[];
   }
-  export default function swaggerJsdoc(options: Options): object;
-  
-} 
+
+  function swaggerJSDoc(options: Options): object;
+  export default swaggerJSDoc;
+}
