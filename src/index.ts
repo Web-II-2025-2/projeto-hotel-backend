@@ -2,14 +2,19 @@ import express from "express";
 import dotenv from "dotenv";
 import sequelize from "./config/database";
 import { setupSwagger } from "./config/swagger";
-import userRoutes from "./routes/userRoutes"
+import userRoutes from "./routes/userRoutes";
+import { roomRoutes } from "./routes/roomRoutes"; 
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+
 app.use(express.json());
+
 app.use("/users", userRoutes);
+app.use("/rooms", roomRoutes);
+
 setupSwagger(app);
 
 sequelize
@@ -22,6 +27,7 @@ sequelize
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Servidor rodando na porta ${PORT}`);
+      console.log(`Swagger disponível em http://localhost:${PORT}/api-docs`);
     });
   })
   .catch((error) => {
