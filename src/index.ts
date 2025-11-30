@@ -4,6 +4,7 @@ import sequelize from "./config/database";
 import { setupSwagger } from "./config/swagger";
 import userRoutes from "./routes/userRoutes";
 import { roomRoutes } from "./routes/roomRoutes"; 
+import { employeeRoutes } from "./routes/employeeRoutes";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use("/users", userRoutes);
 app.use("/rooms", roomRoutes);
+app.use("/employees", employeeRoutes);
 
 setupSwagger(app);
 
