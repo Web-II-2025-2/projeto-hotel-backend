@@ -5,6 +5,7 @@ import { setupSwagger } from "./config/swagger";
 import userRoutes from "./routes/userRoutes";
 import { roomRoutes } from "./routes/roomRoutes"; 
 import { employeeRoutes } from "./routes/employeeRoutes";
+import { errorMiddleware } from "./error/errorMiddleware";
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ app.use("/users", userRoutes);
 app.use("/rooms", roomRoutes);
 app.use("/employees", employeeRoutes);
 
+
+app.use(errorMiddleware); 
 setupSwagger(app);
 
 sequelize
