@@ -1,10 +1,11 @@
-import { Request, Response } from "express";
-import { AppError } from "./AppError";
+import { Request, Response, NextFunction } from "express";
+import { AppError } from "../error/AppError";
 
 export const errorMiddleware = (
   err: Error,
   req: Request,
-  res: Response) => {
+  res: Response,
+  next: NextFunction) => {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       status: "error",

@@ -5,7 +5,7 @@ import { setupSwagger } from "./config/swagger";
 import userRoutes from "./routes/userRoutes";
 import { roomRoutes } from "./routes/roomRoutes"; 
 import { employeeRoutes } from "./routes/employeeRoutes";
-import { errorMiddleware } from "./error/errorMiddleware";
+import { errorMiddleware } from "./middleware/errorMiddleware";
 import { reservationRoutes } from "./routes/reservationRoutes";
 
 dotenv.config();
