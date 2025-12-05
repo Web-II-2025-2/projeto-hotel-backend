@@ -16,10 +16,6 @@ const controller = new RoomController();
  *         - status
  *         - dailyRate
  *       properties:
- *         id:
- *           type: integer
- *           description: ID gerado automaticamente
- *           example: 1
  *         number:
  *           type: string
  *           description: Número ou identificador do quarto
