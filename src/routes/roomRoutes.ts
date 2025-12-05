@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { RoomController } from "../controllers/RoomController";
-import { roomCreationSchema, roomUpdateSchema} from '../schema/room/roomSchema';
+import { roomCreationSchema, roomUpdateSchema} from '../schema/roomSchema';
 import { validateDTO } from '../middleware/validate.middleware';
 
 
