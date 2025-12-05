@@ -63,6 +63,8 @@ const controller = new UserController();
  *               $ref: '#/components/schemas/User'
  *       400:
  *         description: Erro na criação do usuário.
+ *       409:
+ *         description: Conflito - E-mail já está sendo utilizado.
  */
 router.post("/", validateDTO(userCreationSchema), controller.createUser.bind(controller));
 

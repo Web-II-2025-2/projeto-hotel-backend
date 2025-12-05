@@ -2,6 +2,10 @@ import { User } from "../models/User";
 
 export class UserRepository {
 
+  async findByEmail(email: string) : Promise<User | null> {
+    return await User.findOne({ where: { email } });
+  }
+
   async createUser(name: string, email: string, cpf: string, phoneNumber: string) {
     const user = await User.create({
         name,
