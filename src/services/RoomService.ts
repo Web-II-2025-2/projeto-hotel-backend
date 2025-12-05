@@ -14,7 +14,7 @@ export class RoomService {
     return await this.roomRepository.createRoom(data);
   }
 
-  async getRoom(id: number): Promise<Room | null>  {
+  async getRoom(id: number): Promise<Room>  {
     const room = await this.roomRepository.getRoom(id);
     if (!room) throw new AppError('room not found.', 404);
     return room;

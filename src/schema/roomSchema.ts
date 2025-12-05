@@ -1,4 +1,3 @@
-// src/schemas/room.schemas.ts
 import { z } from 'zod';
 import { RoomType } from "../enums/RoomType";
 import { RoomStatus } from "../enums/RoomStatus";
