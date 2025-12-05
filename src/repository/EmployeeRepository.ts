@@ -2,6 +2,10 @@ import Employee, { EmployeeCreationAttributes, EmployeeAttributes } from "../mod
 
 export class EmployeeRepository {
   
+  async findByEmail(email: string): Promise<Employee | null> {
+    return await Employee.findOne( { where: { email } })
+  }
+  
   async create(data: EmployeeCreationAttributes): Promise<Employee> {
     return await Employee.create(data);
   }
