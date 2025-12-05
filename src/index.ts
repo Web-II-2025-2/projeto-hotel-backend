@@ -5,6 +5,7 @@ import { setupSwagger } from "./config/swagger";
 import userRoutes from "./routes/userRoutes";
 import { roomRoutes } from "./routes/roomRoutes"; 
 import { employeeRoutes } from "./routes/employeeRoutes";
+import { reservationRoutes } from "./routes/reservationRoutes";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/users", userRoutes);
 app.use("/rooms", roomRoutes);
 app.use("/employees", employeeRoutes);
+app.use("/reservations", reservationRoutes);
 
 setupSwagger(app);
 
