@@ -7,6 +7,7 @@ This project is a RESTful API developed in **Node.js** with **TypeScript** for h
 - **Language:** TypeScript
 - **Runtime:** Node.js
 - **Web Framework:** Express
+- **Validation:** Zod
 - **ORM:** Sequelize
 - **Database:** PostgreSQL
 - **Containerization:** Docker & Docker Compose
@@ -34,7 +35,11 @@ After starting the server, access it in your browser at:
 
 ## How to Run the Project
 
-Make sure you have **Docker** and **Docker Compose** installed.
+### Prerequisites
+Before running the project, ensure you have the following installed on your machine:
+* **Node.js**
+* **npm**
+* **Docker** & **Docker Compose**
 
 ### 1. Environment Configuration
 Follow the example in the `.env.example` file and create a `.env` file, replacing the placeholders with your desired values.
