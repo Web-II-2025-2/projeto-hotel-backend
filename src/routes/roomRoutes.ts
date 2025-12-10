@@ -1,5 +1,9 @@
 import { Router } from "express";
 import { RoomController } from "../controllers/RoomController";
+import { roomCreationSchema, roomUpdateSchema} from '../schema/roomSchema';
+import { validateDTO } from '../middleware/validate.middleware';
+
+
 
 const router = Router();
 const controller = new RoomController();
@@ -74,7 +78,7 @@ const controller = new RoomController();
  *       400:
  *         description: Erro na criação do quarto.
  */
-router.post("/", controller.createRoom.bind(controller));
+router.post("/", validateDTO(roomCreationSchema), controller.createRoom.bind(controller));
 
 /**
  * @swagger
@@ -148,7 +152,7 @@ router.get("/:id", controller.getRoom.bind(controller));
  *       404:
  *         description: Quarto não encontrado.
  */
-router.put("/:id", controller.updateRoom.bind(controller));
+router.put("/:id", validateDTO(roomUpdateSchema), controller.updateRoom.bind(controller));
 
 /**
  * @swagger

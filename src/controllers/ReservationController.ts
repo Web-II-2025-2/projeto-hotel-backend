@@ -7,47 +7,27 @@ const reservationService = new ReservationService();
 export class ReservationController {
 
     async createReservation(req: Request<{}, {}, ReservationCreationAttributes>, res: Response) {
-        try {
-            const reservation = await reservationService.create(req.body);
-            return res.status(201).json(reservation);
-        } catch (e: any) {
-            return res.status(400).json({ error: e.message });
-        }
+        const reservation = await reservationService.create(req.body);
+        return res.status(201).json(reservation);
     }
 
     async getReservation(req: Request, res: Response) {
-        try {
-            const reservation = await reservationService.getById(Number(req.params.id));
-            return res.json(reservation);
-        } catch (e: any) {
-            return res.status(404).json({ error: e.message });
-        }
+        const reservation = await reservationService.getById(Number(req.params.id));
+        return res.json(reservation);
     }
 
     async updateReservation(req: Request<{ id: string }, {}, ReservationAttributes>, res: Response) {
-        try {
-            const reservation = await reservationService.update(Number(req.params.id), req.body);
-            return res.json(reservation);
-        } catch (e: any) {
-            return res.status(404).json({ error: e.message });
-        }
+        const reservation = await reservationService.update(Number(req.params.id), req.body);
+        return res.json(reservation);
     }
 
     async getAllReservations(req: Request, res: Response) {
-        try {
-            const reservation = await reservationService.getAll();
-            return res.json(reservation);
-        } catch (e: any) {
-            return res.status(400).json({ error: e.message });
-        }
+        const reservation = await reservationService.getAll();
+        return res.json(reservation);
     }
 
     async deleteReservation(req: Request, res: Response) {
-        try {
-            await reservationService.delete(Number(req.params.id));
-            return res.status(204).send();
-        } catch (e: any) {
-            return res.status(404).json({ error: e.message });
-        }
+        await reservationService.delete(Number(req.params.id));
+        return res.status(204).send();
     }
 }

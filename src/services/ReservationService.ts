@@ -1,25 +1,28 @@
-import Room from "../models/Room";
+import { RoomService } from "./RoomService";
+import { UserService } from "./UserService";
 import Reservation, { ReservationCreationAttributes } from "../models/Reservation";
-import { User } from "../models/User";
 import { ReservationRepository } from "../repository/ReservationRepository";
 import { ReservationStatus } from "../enums/ReservationStatus";
+import { AppError } from "../error/AppError";
 
 export class ReservationService {
+
+    private roomService = new RoomService();
+
+    private userService = new UserService();
+
     private reservationRepository = new ReservationRepository();
     async create(data: ReservationCreationAttributes): Promise<Reservation> {
         const { userId, roomId, checkIn, checkOut } = data;
         const checkInDate = new Date(checkIn);
         const checkOutDate = new Date(checkOut);
-        const room = await Room.findByPk(roomId);
-        const user = await User.findByPk(userId);
-
-        if (!room) throw new Error("Entitade não existe");
-        if (!user) throw new Error("Usuário não existe");
-        if (checkInDate>checkOutDate) throw new Error("A reserva possui datas inválidas.");
+        
+        const room = await this.roomService.getRoom(roomId);
+        const user = await this.userService.getUser(userId);
 
         const isOccupied = await this.checkIfAlreadyHasReservation(roomId, checkInDate, checkOutDate);
         if (isOccupied) {
-            throw new Error("O quarto já está ocupado nos dias escolhidos.");
+            throw new AppError("O quarto já está ocupado nos dias escolhidos.", 409);
         }
 
         const totalPrice = this.calculateTotalPrice(checkInDate, checkOutDate, room.dailyRate);
@@ -41,7 +44,7 @@ export class ReservationService {
     async getById(id: number): Promise<Reservation> {
         const reservation = await this.reservationRepository.findById(id);
         if (!reservation) {
-            throw new Error("Reserva não encontrada.");
+            throw new AppError("Reserva não encontrada.", 404);
         }
         return reservation;
     }
@@ -50,7 +53,7 @@ export class ReservationService {
         const reservation = await this.getById(id);
 
         if (reservation.status === ReservationStatus.CANCELED || reservation.status === ReservationStatus.CHECKED_OUT) 
-          throw new Error("Não é possível alterar uma reserva cancelada ou finalizada.");
+          throw new AppError("Não é possível alterar uma reserva cancelada ou finalizada.", 400);
 
         const newCheckIn = data.checkIn ? new Date(data.checkIn) : reservation.checkIn;
         const newCheckOut = data.checkOut ? new Date(data.checkOut) : reservation.checkOut;
@@ -60,17 +63,14 @@ export class ReservationService {
 
         if (hasDateChanged) {
             if (newCheckIn >= newCheckOut) {
-                throw new Error("A data de check-out deve ser posterior ao check-in.");
+                throw new AppError("A data de check-out deve ser posterior ao check-in.", 400);
             }
 
             const isOccupied = await this.checkIfAlreadyHasReservation(reservation.roomId, newCheckIn, newCheckOut, id);
             
-            if (isOccupied) throw new Error("As novas datas não estão disponíveis para este quarto.");
+            if (isOccupied) throw new AppError("As novas datas não estão disponíveis para este quarto.", 409);
 
-            const room = await Room.findByPk(reservation.roomId);
-            if (!room) {
-                throw new Error("Quarto associado à reserva não encontrado.");
-            }
+            const room = await this.roomService.getRoom(reservation.roomId);
 
             reservation.totalPrice = this.calculateTotalPrice(newCheckIn, newCheckOut, room.dailyRate);
         }

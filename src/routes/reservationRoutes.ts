@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { ReservationController } from "../controllers/ReservationController";
+import { validateDTO } from '../middleware/validate.middleware';
+import { reservationCreationSchema, reservationUpdateSchema } from "../schema/reservationSchema";
 
 const router = Router();
 const controller = new ReservationController();
@@ -82,7 +84,7 @@ const controller = new ReservationController();
  *       400:
  *         description: Erro de validação (datas inválidas, quarto ocupado, usuário inexistente).
  */
-router.post("/", controller.createReservation.bind(controller));
+router.post("/", validateDTO(reservationCreationSchema), controller.createReservation.bind(controller));
 
 /**
  * @swagger
@@ -159,7 +161,7 @@ router.get("/:id", controller.getReservation.bind(controller));
  *       404:
  *         description: Reserva não encontrada.
  */
-router.put("/:id", controller.updateReservation.bind(controller));
+router.put("/:id", validateDTO(reservationUpdateSchema), controller.updateReservation.bind(controller));
 
 /**
  * @swagger

@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { EmployeeController } from "../controllers/EmployeeController";
+import { employeeCreationSchema, employeeUpdateSchema } from '../schema/employeeSchema';
+import { validateDTO } from '../middleware/validate.middleware';
 
 const router = Router();
 const controller = new EmployeeController();
@@ -65,7 +67,7 @@ const controller = new EmployeeController();
  *       400:
  *         description: "Erro de validação (ex: Email duplicado)."
  */
-router.post("/", controller.createEmployee.bind(controller));
+router.post("/", validateDTO(employeeCreationSchema), controller.createEmployee.bind(controller));
 
 /**
  * @swagger
@@ -139,7 +141,7 @@ router.get("/:id", controller.getEmployee.bind(controller));
  *       404:
  *         description: Funcionário não encontrado.
  */
-router.put("/:id", controller.updateEmployee.bind(controller));
+router.put("/:id", validateDTO(employeeUpdateSchema), controller.updateEmployee.bind(controller));
 
 /**
  * @swagger

@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { UserController } from "../controllers/UserController";
+import { validateDTO } from '../middleware/validate.middleware';
+import { userCreationSchema, userUpdateSchema} from '../schema/userSchema';
 
 const router = Router();
 const controller = new UserController();
@@ -15,10 +17,6 @@ const controller = new UserController();
  *         - email
  *         - cpf
  *       properties:
- *         id:
- *           type: integer
- *           description: ID gerado automaticamente (Auto-increment)
- *           example: 1
  *         name:
  *           type: string
  *           description: Nome completo do usuário
@@ -65,8 +63,10 @@ const controller = new UserController();
  *               $ref: '#/components/schemas/User'
  *       400:
  *         description: Erro na criação do usuário.
+ *       409:
+ *         description: Conflito - E-mail já está sendo utilizado.
  */
-router.post("/", controller.createUser.bind(controller));
+router.post("/", validateDTO(userCreationSchema), controller.createUser.bind(controller));
 
 /**
  * @swagger
@@ -140,7 +140,7 @@ router.get("/:id", controller.getUser.bind(controller));
  *       404:
  *         description: Usuário não encontrado.
  */
-router.put("/:id", controller.updateUser.bind(controller));
+router.put("/:id", validateDTO(userUpdateSchema), controller.updateUser.bind(controller));
 
 /**
  * @swagger

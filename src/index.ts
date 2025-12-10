@@ -5,6 +5,7 @@ import { setupSwagger } from "./config/swagger";
 import userRoutes from "./routes/userRoutes";
 import { roomRoutes } from "./routes/roomRoutes"; 
 import { employeeRoutes } from "./routes/employeeRoutes";
+import { errorMiddleware } from "./middleware/errorMiddleware";
 import { reservationRoutes } from "./routes/reservationRoutes";
 import { eventRoutes } from "./routes/eventRoutes";
 
@@ -21,6 +22,8 @@ app.use("/employees", employeeRoutes);
 app.use("/reservations", reservationRoutes);
 app.use("/events", eventRoutes);
 
+
+app.use(errorMiddleware); 
 setupSwagger(app);
 
 sequelize
