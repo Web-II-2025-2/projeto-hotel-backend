@@ -64,7 +64,7 @@ const controller = new EmployeeController();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Employee'
- *       400:
+ *       409:
  *         description: "Erro de validação (ex: Email duplicado)."
  */
 router.post("/", validateDTO(employeeCreationSchema), controller.createEmployee.bind(controller));

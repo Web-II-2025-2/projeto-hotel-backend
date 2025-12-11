@@ -83,6 +83,8 @@ const controller = new ReservationController();
  *               $ref: '#/components/schemas/Reservation'
  *       400:
  *         description: Erro de validação (datas inválidas, quarto ocupado, usuário inexistente).
+ *       409:
+ *         description: O quarto já está ocupado nos dias escolhidos.
  */
 router.post("/", validateDTO(reservationCreationSchema), controller.createReservation.bind(controller));
 

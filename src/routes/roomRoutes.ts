@@ -77,6 +77,8 @@ const controller = new RoomController();
  *               $ref: '#/components/schemas/Room'
  *       400:
  *         description: Erro na criação do quarto.
+ *       409:
+ *         description: Este número de quarto já está sendo utilizado.
  */
 router.post("/", validateDTO(roomCreationSchema), controller.createRoom.bind(controller));
 
