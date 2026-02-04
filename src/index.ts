@@ -8,6 +8,8 @@ import { employeeRoutes } from "./routes/employeeRoutes";
 import { errorMiddleware } from "./middleware/errorMiddleware";
 import { reservationRoutes } from "./routes/reservationRoutes";
 import { eventRoutes } from "./routes/eventRoutes";
+import authRoutes from "./routes/authRoutes";
+import { authenticate } from "./middleware/authMiddleware";
 
 dotenv.config();
 
@@ -15,16 +17,16 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(express.json());
+app.use('/auth', authRoutes);
 
+setupSwagger(app);
+app.use(authenticate);
 app.use("/users", userRoutes);
 app.use("/rooms", roomRoutes);
 app.use("/employees", employeeRoutes);
 app.use("/reservations", reservationRoutes);
 app.use("/events", eventRoutes);
-
-
 app.use(errorMiddleware); 
-setupSwagger(app);
 
 sequelize
   .authenticate()
