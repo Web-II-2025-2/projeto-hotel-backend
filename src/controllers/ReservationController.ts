@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ReservationCreationAttributes, ReservationAttributes } from "../models/Reservation";
 import { ReservationService } from "../services/ReservationService";
+import { UserAuthRequest } from "../config/request";
 
 const reservationService = new ReservationService();
 
@@ -29,5 +30,10 @@ export class ReservationController {
     async deleteReservation(req: Request, res: Response) {
         await reservationService.delete(Number(req.params.id));
         return res.status(204).send();
+    }
+
+    async getMyReservations(req: UserAuthRequest, res: Response) {
+        const reservations = await reservationService.getByGuestId(req.user.id);
+        return res.json(reservations);
     }
 }
