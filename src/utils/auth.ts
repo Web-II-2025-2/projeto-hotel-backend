@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { RoleType } from '../enums/RoleType';
 
 dotenv.config();
 
@@ -21,8 +22,12 @@ export const comparePassword = async (password: string, hashedPassword: string):
 
 // Função para gerar um token JWT
 
-export const generateToken = (userId: number, username: string): string => {
-  return jwt.sign({ id: userId, username }, JWT_SECRET, { expiresIn: '1h' });
+export const generateToken = (credentialId: number, role: RoleType): string => {
+  return jwt.sign(
+    { id: credentialId, role }, 
+    JWT_SECRET, 
+    { expiresIn: '1h' }
+  );
 };
 
 // Função para verificar um token JWT
