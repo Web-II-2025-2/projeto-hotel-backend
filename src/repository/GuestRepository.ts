@@ -12,13 +12,11 @@ export class GuestRepository {
     return guest;
   }
 
-  async getGuest(id: number) {
-    return await Guest.findByPk(id);
+  async getGuest(id_credential: number) {
+    return await Guest.findOne({ where: { credentialId: id_credential } });
   }
 
-  async updateGuest(id: number, data: Partial<Guest>) {
-    const guest = await Guest.findByPk(id);
-    if (!guest) return null; 
+  async updateGuest(guest: Guest, data: Partial<Guest>) {
     await guest.update(data);
     return guest;
   }
@@ -27,7 +25,7 @@ export class GuestRepository {
     return await Guest.findAll();
   }
 
-  async deleteGuest(id: number) {
-    return await Guest.destroy({where: { id }});
+  async deleteGuest(id_credential: number) {
+    return await Guest.destroy({where: { credentialId: id_credential }});
   }
 }

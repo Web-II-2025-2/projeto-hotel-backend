@@ -19,8 +19,8 @@ export class GuestService {
     );
   }
 
-  async getGuest(id: number) {
-    const guest = await this.guestRepository.getGuest(id);
+  async getGuest(id_credential: number) {
+    const guest = await this.guestRepository.getGuest(id_credential);
     if (!guest) {
         throw new AppError('Guest not found.', 404);
     }
@@ -28,10 +28,8 @@ export class GuestService {
   }
 
   async updateGuest(id: number, data: any) {
-    const guest = await this.guestRepository.updateGuest(id, data);
-    if (!guest) {
-        throw new AppError('Guest not found.', 404);
-    }
+    const guest = await this.getGuest(id);
+    await this.guestRepository.updateGuest(guest, data);
     return guest;
   }
 

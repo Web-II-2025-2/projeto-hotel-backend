@@ -1,23 +1,18 @@
 import { Request, Response } from "express";
 import { GuestService } from "../services/GuestService";
-    
+import { UserAuthRequest } from "../config/request";
+
 const guestService = new GuestService();
 
 export class GuestController {
 
-
-    async createGuest(req: Request, res: Response) {
-        const guest = await guestService.createGuest(req.body);
-        return res.status(201).json(guest);
-    }
-
-    async getGuest(req: Request, res: Response) {
-        const guest = await guestService.getGuest(Number(req.params.id));
+    async getGuest(req: UserAuthRequest, res: Response) {
+        const guest = await guestService.getGuest(req.user.id);
         return res.json(guest);
     }
 
-    async updateGuest(req: Request, res: Response) {
-        const guest = await guestService.updateGuest(Number(req.params.id), req.body);
+    async updateGuest(req: UserAuthRequest, res: Response) {
+        const guest = await guestService.updateGuest(req.user.id, req.body);
         return res.json(guest);
     }
 
@@ -26,8 +21,8 @@ export class GuestController {
         return res.json(guests);
     }
 
-    async deleteGuest(req: Request, res: Response) {
-        await guestService.deleteGuest(Number(req.params.id));
+    async deleteGuest(req: UserAuthRequest, res: Response) {
+        await guestService.deleteGuest(Number(req.user.id));
         return res.status(204).send();
     }
 }

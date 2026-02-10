@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import { GuestController } from "../controllers/GuestController";
 import { validateDTO } from '../middleware/validate.middleware';
 import { userCreationSchema, userUpdateSchema} from '../schema/userSchema';
@@ -63,81 +63,9 @@ const controller = new GuestController();
  */
 router.get("/", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getAllGuests.bind(controller));
 
-/**
- * @swagger
- * /users/{id}:
- *   get:
- *     summary: Busca um usuário pelo ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: O ID do usuário
- *     responses:
- *       200:
- *         description: Detalhes do usuário.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       404:
- *         description: Usuário não encontrado.
- */
-router.get("/:id", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getGuest.bind(controller));
+router.get("/profile", authenticate, authorize(AccessLevel.GUEST), (controller.getGuest as unknown as RequestHandler));
 
-/**
- * @swagger
- * /users/{id}:
- *   put:
- *     summary: Atualiza um usuário existente
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: O ID do usuário
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/User'
- *     responses:
- *       200:
- *         description: O usuário foi atualizado.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       404:
- *         description: Usuário não encontrado.
- */
-router.put("/:id", authenticate, authorize(AccessLevel.GUEST), validateDTO(userUpdateSchema), controller.updateGuest.bind(controller));
+router.put("/profile", authenticate, authorize(AccessLevel.GUEST), validateDTO(userUpdateSchema), (controller.updateGuest as unknown as RequestHandler));
 
-/**
- * @swagger
- * /users/{id}:
- *   delete:
- *     summary: Deleta um usuário
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: O ID do usuário
- *     responses:
- *       204:
- *         description: Usuário deletado com sucesso.
- *       404:
- *         description: Usuário não encontrado.
- */
-router.delete("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.deleteGuest.bind(controller));
-
+router.delete("/profile", authenticate, authorize(AccessLevel.GUEST), (controller.deleteGuest as unknown as RequestHandler));
 export { router as guestRoutes };
