@@ -4,9 +4,8 @@ import sequelize from "../config/database";
 export interface EmployeeAttributes {
   id: number;
   name: string;
-  email: string;
-  password: string;
   isActive: boolean;
+  credentialId: number;
 }
 
 export interface EmployeeCreationAttributes
@@ -18,9 +17,8 @@ export class Employee
 {
   public id!: number;
   public name!: string;
-  public email!: string;
-  public password!: string;
   public isActive!: boolean;
+  public credentialId!: number;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -37,22 +35,21 @@ Employee.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true,
-      },
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    credentialId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      unique: true,
+      references: {
+        model: "credentials",
+        key: "id"
+      },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE"
+    }
   },
   {
     sequelize,
@@ -60,5 +57,7 @@ Employee.init(
     timestamps: true
   }
 );
+
+Employee.belongsTo(sequelize.models.Credential, { foreignKey: 'credentialId', as: 'credential' });
 
 export default Employee;
