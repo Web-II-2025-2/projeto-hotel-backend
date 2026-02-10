@@ -2,6 +2,10 @@ import { Router } from "express";
 import { EmployeeController } from "../controllers/EmployeeController";
 import { employeeCreationSchema, employeeUpdateSchema } from '../schema/employeeSchema';
 import { validateDTO } from '../middleware/validate.middleware';
+import { authenticate } from "../middleware/authMiddleware";
+import { authorize } from "../middleware/authMiddleware";
+import { AccessLevel } from "../constants/roles";
+
 
 const router = Router();
 const controller = new EmployeeController();
@@ -48,30 +52,6 @@ const controller = new EmployeeController();
 /**
  * @swagger
  * /employees:
- *   post:
- *     summary: Cadastra um novo funcionário
- *     tags: [Employees]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Employee'
- *     responses:
- *       201:
- *         description: Funcionário criado com sucesso.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Employee'
- *       409:
- *         description: "Erro de validação (ex: Email duplicado)."
- */
-router.post("/", validateDTO(employeeCreationSchema), controller.createEmployee.bind(controller));
-
-/**
- * @swagger
- * /employees:
  *   get:
  *     summary: Lista todos os funcionários
  *     tags: [Employees]
@@ -85,7 +65,7 @@ router.post("/", validateDTO(employeeCreationSchema), controller.createEmployee.
  *               items:
  *                 $ref: '#/components/schemas/Employee'
  */
-router.get("/", controller.getAllEmployees.bind(controller));
+router.get("/", authenticate, authorize(AccessLevel.MANAGER), controller.getAllEmployees.bind(controller));
 
 /**
  * @swagger
@@ -110,7 +90,7 @@ router.get("/", controller.getAllEmployees.bind(controller));
  *       404:
  *         description: Funcionário não encontrado.
  */
-router.get("/:id", controller.getEmployee.bind(controller));
+router.get("/:id", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getEmployee.bind(controller));
 
 /**
  * @swagger
@@ -141,7 +121,7 @@ router.get("/:id", controller.getEmployee.bind(controller));
  *       404:
  *         description: Funcionário não encontrado.
  */
-router.put("/:id", validateDTO(employeeUpdateSchema), controller.updateEmployee.bind(controller));
+router.put("/:id", authenticate, authorize(AccessLevel.EMPLOYEE), validateDTO(employeeUpdateSchema), controller.updateEmployee.bind(controller));
 
 /**
  * @swagger
@@ -162,6 +142,6 @@ router.put("/:id", validateDTO(employeeUpdateSchema), controller.updateEmployee.
  *       404:
  *         description: Funcionário não encontrado.
  */
-router.delete("/:id", controller.deleteEmployee.bind(controller));
+router.delete("/:id", authenticate, authorize(AccessLevel.MANAGER), controller.deleteEmployee.bind(controller));
 
 export { router as employeeRoutes };

@@ -2,6 +2,9 @@ import { Router } from "express";
 import { GuestController } from "../controllers/GuestController";
 import { validateDTO } from '../middleware/validate.middleware';
 import { userCreationSchema, userUpdateSchema} from '../schema/userSchema';
+import { authenticate } from "../middleware/authMiddleware";
+import { authorize } from "../middleware/authMiddleware";
+import { AccessLevel } from "../constants/roles";
 
 const router = Router();
 const controller = new GuestController();
@@ -45,32 +48,6 @@ const controller = new GuestController();
 /**
  * @swagger
  * /users:
- *   post:
- *     summary: Cria um novo usuário
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/User'
- *     responses:
- *       201:
- *         description: O usuário foi criado com sucesso.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       400:
- *         description: Erro na criação do usuário.
- *       409:
- *         description: Conflito - E-mail já está sendo utilizado.
- */
-router.post("/", validateDTO(userCreationSchema), controller.createGuest.bind(controller));
-
-/**
- * @swagger
- * /users:
  *   get:
  *     summary: Retorna a lista de todos os usuários
  *     tags: [Users]
@@ -84,7 +61,7 @@ router.post("/", validateDTO(userCreationSchema), controller.createGuest.bind(co
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get("/", controller.getAllGuests.bind(controller));
+router.get("/", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getAllGuests.bind(controller));
 
 /**
  * @swagger
@@ -109,7 +86,7 @@ router.get("/", controller.getAllGuests.bind(controller));
  *       404:
  *         description: Usuário não encontrado.
  */
-router.get("/:id", controller.getGuest.bind(controller));
+router.get("/:id", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getGuest.bind(controller));
 
 /**
  * @swagger
@@ -140,7 +117,7 @@ router.get("/:id", controller.getGuest.bind(controller));
  *       404:
  *         description: Usuário não encontrado.
  */
-router.put("/:id", validateDTO(userUpdateSchema), controller.updateGuest.bind(controller));
+router.put("/:id", authenticate, authorize(AccessLevel.GUEST), validateDTO(userUpdateSchema), controller.updateGuest.bind(controller));
 
 /**
  * @swagger
@@ -161,6 +138,6 @@ router.put("/:id", validateDTO(userUpdateSchema), controller.updateGuest.bind(co
  *       404:
  *         description: Usuário não encontrado.
  */
-router.delete("/:id", controller.deleteGuest.bind(controller));
+router.delete("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.deleteGuest.bind(controller));
 
 export { router as guestRoutes };

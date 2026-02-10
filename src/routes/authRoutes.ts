@@ -2,7 +2,7 @@ import express from "express";
 import { AuthController } from "../controllers/AuthController";
 import { authenticate } from "../middleware/authMiddleware";
 import { authorize } from "../middleware/authMiddleware";
-import { RoleType } from "../enums/RoleType";
+import { AccessLevel } from "../constants/roles";
 
 const router = express.Router();
 const authController = new AuthController();
@@ -38,8 +38,8 @@ const authController = new AuthController();
  */
 router.post("/login", authController.login);
 
-router.post("/register-employee", authenticate, authorize([RoleType.MANAGER, RoleType.ADMIN]), authController.register_employee);
-router.post("/register-manager", authenticate, authorize([RoleType.ADMIN]), authController.register_manager);
+router.post("/register-employee", authenticate, authorize(AccessLevel.MANAGER), authController.register_employee);
+router.post("/register-manager", authenticate, authorize(AccessLevel.ADMIN), authController.register_manager);
 router.post("/register-guest", authController.register_guest);
 
 export default router;
