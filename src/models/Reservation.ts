@@ -1,12 +1,12 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "../config/database";
-import { User } from "./User";
+import { Guest } from "./Guest";
 import { Room } from "./Room";
 import { ReservationStatus } from "../enums/ReservationStatus";
 
 export interface ReservationAttributes {
     id: number;
-    userId: number; 
+    guestId: number; 
     roomId: number; 
     checkIn: Date;
     checkOut: Date;
@@ -22,7 +22,7 @@ export class Reservation
     implements ReservationAttributes
 {
     public id!: number;
-    public userId!: number;
+    public guestId!: number;
     public roomId!: number;
     public checkIn!: Date;
     public checkOut!: Date;
@@ -37,11 +37,11 @@ Reservation.init(
             autoIncrement: true,
             primaryKey: true
         },
-        userId: {
+        guestId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'users', 
+                model: 'guests', 
                 key: 'id'
             }
         },
@@ -77,7 +77,7 @@ Reservation.init(
     }
 );
 
-Reservation.belongsTo(User, { foreignKey: 'userId', as: 'guest' });
+Reservation.belongsTo(Guest, { foreignKey: 'guestId', as: 'guest' });
 Reservation.belongsTo(Room, { foreignKey: 'roomId', as: 'room' });
 
 export default Reservation;

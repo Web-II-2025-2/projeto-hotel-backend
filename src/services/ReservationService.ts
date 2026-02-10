@@ -1,5 +1,5 @@
 import { RoomService } from "./RoomService";
-import { UserService } from "./UserService";
+import { GuestService } from "./GuestService";
 import Reservation, { ReservationCreationAttributes } from "../models/Reservation";
 import { ReservationRepository } from "../repository/ReservationRepository";
 import { ReservationStatus } from "../enums/ReservationStatus";
@@ -9,16 +9,16 @@ export class ReservationService {
 
     private roomService = new RoomService();
 
-    private userService = new UserService();
+    private guestService = new GuestService();
 
     private reservationRepository = new ReservationRepository();
     async create(data: ReservationCreationAttributes): Promise<Reservation> {
-        const { userId, roomId, checkIn, checkOut } = data;
+        const { guestId, roomId, checkIn, checkOut } = data;
         const checkInDate = new Date(checkIn);
         const checkOutDate = new Date(checkOut);
         
         const room = await this.roomService.getRoom(roomId);
-        const user = await this.userService.getUser(userId);
+        const guest = await this.guestService.getGuest(guestId);
 
         const isOccupied = await this.checkIfAlreadyHasReservation(roomId, checkInDate, checkOutDate);
         if (isOccupied) {
@@ -28,7 +28,7 @@ export class ReservationService {
         const totalPrice = this.calculateTotalPrice(checkInDate, checkOutDate, room.dailyRate);
 
         return await this.reservationRepository.create({
-            userId,
+            guestId,
             roomId,
             checkIn: checkInDate,
             checkOut: checkOutDate,
@@ -75,7 +75,7 @@ export class ReservationService {
             reservation.totalPrice = this.calculateTotalPrice(newCheckIn, newCheckOut, room.dailyRate);
         }
 
-        if (data.userId) reservation.userId = data.userId;
+        if (data.guestId) reservation.guestId = data.guestId;
         
         reservation.checkIn = newCheckIn;
         reservation.checkOut = newCheckOut;
