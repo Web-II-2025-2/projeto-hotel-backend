@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import sequelize from "./config/database";
 import { setupSwagger } from "./config/swagger";
-import userRoutes from "./routes/userRoutes";
+import { guestRoutes } from "./routes/guestRoutes";
 import { roomRoutes } from "./routes/roomRoutes"; 
 import { employeeRoutes } from "./routes/employeeRoutes";
 import { errorMiddleware } from "./middleware/errorMiddleware";
@@ -21,7 +21,7 @@ app.use('/auth', authRoutes);
 
 setupSwagger(app);
 app.use(authenticate);
-app.use("/users", userRoutes);
+app.use("/guests", guestRoutes);
 app.use("/rooms", roomRoutes);
 app.use("/employees", employeeRoutes);
 app.use("/reservations", reservationRoutes);
