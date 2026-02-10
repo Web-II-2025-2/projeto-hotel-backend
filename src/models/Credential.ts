@@ -1,26 +1,27 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "../config/database";
+import { RoleType } from "../enums/RoleType";
 
-export interface PersonAttributes {
+export interface CredentialAttributes {
     id: number;
     email: string;
     passwordHash: string;
-    userId: number;
+    role: RoleType;
 }
 
-export interface PersonCreationAttributes
-    extends Optional<PersonAttributes, "id"> { }
+export interface CredentialCreationAttributes
+    extends Optional<CredentialAttributes, "id"> { }
 
-export class Person
-    extends Model<PersonAttributes, PersonCreationAttributes>
-    implements PersonAttributes {
+export class Credential
+    extends Model<CredentialAttributes, CredentialCreationAttributes>
+    implements CredentialAttributes {
     public id!: number;
     public email!: string;
     public passwordHash!: string;
-    public userId!: number;
+    public role!: RoleType;
 }
 
-Person.init(
+Credential.init(
     {
         id: {
             type: DataTypes.INTEGER,
@@ -36,19 +37,15 @@ Person.init(
             type: DataTypes.STRING,
             allowNull: false
         },
-        userId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-                model: "users",
-                key: "id"
-            },
-            onDelete: "CASCADE"
+        role: {
+            type: DataTypes.ENUM(...Object.values(RoleType)),
+            allowNull: false
         }
     },
     {
         sequelize,
-        tableName: "user_login_info",
+        modelName: "Credential",
+        tableName: "credentials",
         timestamps: false
     }
 );
