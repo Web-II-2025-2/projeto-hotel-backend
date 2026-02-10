@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { UserController } from "../controllers/UserController";
+import { GuestController } from "../controllers/GuestController";
 import { validateDTO } from '../middleware/validate.middleware';
 import { userCreationSchema, userUpdateSchema} from '../schema/userSchema';
 
 const router = Router();
-const controller = new UserController();
+const controller = new GuestController();
 
 /**
  * @swagger
@@ -66,7 +66,7 @@ const controller = new UserController();
  *       409:
  *         description: Conflito - E-mail já está sendo utilizado.
  */
-router.post("/", validateDTO(userCreationSchema), controller.createUser.bind(controller));
+router.post("/", validateDTO(userCreationSchema), controller.createGuest.bind(controller));
 
 /**
  * @swagger
@@ -84,7 +84,7 @@ router.post("/", validateDTO(userCreationSchema), controller.createUser.bind(con
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get("/", controller.getAllUsers.bind(controller));
+router.get("/", controller.getAllGuests.bind(controller));
 
 /**
  * @swagger
@@ -109,7 +109,7 @@ router.get("/", controller.getAllUsers.bind(controller));
  *       404:
  *         description: Usuário não encontrado.
  */
-router.get("/:id", controller.getUser.bind(controller));
+router.get("/:id", controller.getGuest.bind(controller));
 
 /**
  * @swagger
@@ -140,7 +140,7 @@ router.get("/:id", controller.getUser.bind(controller));
  *       404:
  *         description: Usuário não encontrado.
  */
-router.put("/:id", validateDTO(userUpdateSchema), controller.updateUser.bind(controller));
+router.put("/:id", validateDTO(userUpdateSchema), controller.updateGuest.bind(controller));
 
 /**
  * @swagger
@@ -161,6 +161,6 @@ router.put("/:id", validateDTO(userUpdateSchema), controller.updateUser.bind(con
  *       404:
  *         description: Usuário não encontrado.
  */
-router.delete("/:id", controller.deleteUser.bind(controller));
+router.delete("/:id", controller.deleteGuest.bind(controller));
 
-export default router;
+export { router as guestRoutes };
