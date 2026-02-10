@@ -89,6 +89,15 @@ export class ReservationService {
         await this.reservationRepository.delete(id);
     }
 
+    async getByGuestId(id_credential: number): Promise<Reservation[]> {
+        const guest = await this.guestService.getGuest(id_credential);
+        if (!guest) {
+            throw new AppError("Hóspede não encontrado.", 404);
+        }
+
+        return await this.reservationRepository.findByGuestId(guest.id);
+    }
+
     private calculateTotalPrice(checkIn: Date, checkOut: Date, dailyRate: number): number {
         const diffTime = Math.abs(checkOut.getTime() - checkIn.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));

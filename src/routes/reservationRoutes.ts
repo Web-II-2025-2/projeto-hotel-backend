@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import { ReservationController } from "../controllers/ReservationController";
 import { validateDTO } from '../middleware/validate.middleware';
 import { reservationCreationSchema, reservationUpdateSchema } from "../schema/reservationSchema";
@@ -109,6 +109,8 @@ router.post("/", authenticate, authorize(AccessLevel.GUEST), validateDTO(reserva
  *                 $ref: '#/components/schemas/Reservation'
  */
 router.get("/", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getAllReservations.bind(controller));
+
+router.get("/my-reservations", authenticate, authorize(AccessLevel.GUEST), (controller.getMyReservations as unknown as RequestHandler));
 
 /**
  * @swagger

@@ -48,4 +48,8 @@ export class ReservationRepository {
 
     return await Reservation.findOne({ where: whereClause });
   }
+
+  async findByGuestId(guestId: number): Promise<Reservation[]> {
+    return await Reservation.findAll({ where: { guestId } });
+  }
 }
