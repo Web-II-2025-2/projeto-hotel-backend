@@ -7,8 +7,9 @@ const reservationService = new ReservationService();
 
 export class ReservationController {
 
-    async createReservation(req: Request<{}, {}, ReservationCreationAttributes>, res: Response) {
-        const reservation = await reservationService.create(req.body);
+    async createReservation(req: Request<{}, {}, Omit<ReservationCreationAttributes, 'guestId'>>, res: Response) {
+        const credentialId = (req as any).user.id;
+        const reservation = await reservationService.create(credentialId, req.body);
         return res.status(201).json(reservation);
     }
 

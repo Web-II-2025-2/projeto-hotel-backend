@@ -90,7 +90,7 @@ const controller = new ReservationController();
  *       409:
  *         description: O quarto já está ocupado nos dias escolhidos.
  */
-router.post("/", authenticate, authorize(AccessLevel.GUEST), validateDTO(reservationCreationSchema), controller.createReservation.bind(controller));
+router.post("/", authenticate, authorize(AccessLevel.GUEST), validateDTO(reservationCreationSchema), (controller.createReservation as unknown as RequestHandler));
 
 /**
  * @swagger

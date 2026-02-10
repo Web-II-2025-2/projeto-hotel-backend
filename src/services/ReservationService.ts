@@ -12,13 +12,13 @@ export class ReservationService {
     private guestService = new GuestService();
 
     private reservationRepository = new ReservationRepository();
-    async create(data: ReservationCreationAttributes): Promise<Reservation> {
-        const { guestId, roomId, checkIn, checkOut } = data;
+    async create(credentialId: number, data: Omit<ReservationCreationAttributes, 'guestId'>): Promise<Reservation> {
+        const { roomId, checkIn, checkOut } = data;
         const checkInDate = new Date(checkIn);
         const checkOutDate = new Date(checkOut);
         
         const room = await this.roomService.getRoom(roomId);
-        const guest = await this.guestService.getGuest(guestId);
+        const guest = await this.guestService.getGuest(credentialId);
 
         const isOccupied = await this.checkIfAlreadyHasReservation(roomId, checkInDate, checkOutDate);
         if (isOccupied) {
@@ -28,7 +28,7 @@ export class ReservationService {
         const totalPrice = this.calculateTotalPrice(checkInDate, checkOutDate, room.dailyRate);
 
         return await this.reservationRepository.create({
-            guestId,
+            guestId: guest.id,
             roomId,
             checkIn: checkInDate,
             checkOut: checkOutDate,
