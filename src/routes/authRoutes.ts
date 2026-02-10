@@ -1,5 +1,8 @@
 import express from "express";
 import { AuthController } from "../controllers/AuthController";
+import { authenticate } from "../middleware/authMiddleware";
+import { authorize } from "../middleware/authMiddleware";
+import { RoleType } from "../enums/RoleType";
 
 const router = express.Router();
 const authController = new AuthController();
@@ -35,38 +38,8 @@ const authController = new AuthController();
  */
 router.post("/login", authController.login);
 
-/**
- * @swagger
- * /auth/register:
- *   post:
- *     summary: Registra um novo usuário
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/AuthRegisterDTO'
- *           example:
- *             name: João Silva
- *             email: joao@email.com
- *             cpf: "12345678900"
- *             phoneNumber: "+5583999999999"
- *             password: SenhaForte123
- *     responses:
- *       201:
- *         description: Usuário registrado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User registered successfully
- *       400:
- *         description: Dados inválidos
- */
-router.post("/register", authController.register);
+router.post("/register-employee", authenticate, authorize([RoleType.MANAGER, RoleType.ADMIN]), authController.register_employee);
+router.post("/register-manager", authenticate, authorize([RoleType.ADMIN]), authController.register_manager);
+router.post("/register-guest", authController.register_guest);
 
 export default router;
