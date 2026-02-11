@@ -7,6 +7,10 @@ export class CredentialRepository {
         return await Credential.findOne({ where: { email } });
     }
 
+    async findById(id: number): Promise<Credential | null> {
+        return await Credential.findByPk(id);
+    }
+
     async createCredential(
         email: string,
         passwordHash: string,
