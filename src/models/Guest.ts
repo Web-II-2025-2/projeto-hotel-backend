@@ -61,7 +61,3 @@ Guest.init(
     timestamps: false
   }
 );
-
-Guest.belongsTo(sequelize.models.Credential, { foreignKey: 'credentialId', as: 'credential' });
-
-export default Guest;

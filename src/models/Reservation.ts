@@ -1,7 +1,5 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "../config/database";
-import { Guest } from "./Guest";
-import { Room } from "./Room";
 import { ReservationStatus } from "../enums/ReservationStatus";
 
 export interface ReservationAttributes {
@@ -76,8 +74,3 @@ Reservation.init(
         timestamps: true 
     }
 );
-
-Reservation.belongsTo(Guest, { foreignKey: 'guestId', as: 'guest' });
-Reservation.belongsTo(Room, { foreignKey: 'roomId', as: 'room' });
-
-export default Reservation;

@@ -57,7 +57,3 @@ Employee.init(
     timestamps: true
   }
 );
-
-Employee.belongsTo(sequelize.models.Credential, { foreignKey: 'credentialId', as: 'credential' });
-
-export default Employee;
