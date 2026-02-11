@@ -25,4 +25,10 @@ export class EmployeeController {
         await employeeService.deleteEmployee(Number(req.params.id));
         return res.status(204).send();
     }
+
+    async cleanRoom(req: Request<{ id_room: string }>, res: Response) {
+        const roomId = Number(req.params.id_room);
+        await employeeService.cleanRoom(roomId);
+        return res.status(200).json({ message: `Quarto ${roomId} limpo com sucesso.` });
+    }
 }

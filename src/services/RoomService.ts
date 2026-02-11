@@ -1,3 +1,5 @@
+import { RoomStatus } from "../enums/RoomStatus";
+import { RoomType } from "../enums/RoomType";
 import { AppError } from "../error/AppError";
 import { Room, RoomAttributes, RoomCreationAttributes } from "../models/Room";
 import { RoomRepository } from "../repository/RoomRepository";
@@ -44,5 +46,16 @@ export class RoomService {
     const deleted = await this.roomRepository.deleteRoom(id);
     if (!deleted) throw new AppError("Room not found", 404);
     return true;
+  }
+
+  async cleanRoom(roomId: number) {
+    const room = await this.getRoom(roomId);
+    if (room.status !== RoomStatus.DIRTY) {
+        throw new AppError("Este quarto não está marcado para limpeza.", 400);
+    }
+    return await this.updateRoom(roomId, { 
+        ...room.get(),
+        status: RoomStatus.AVAILABLE 
+        });
   }
 }

@@ -101,7 +101,11 @@ router.post("/", authenticate, authorize(AccessLevel.EMPLOYEE), validateDTO(room
  *               items:
  *                 $ref: '#/components/schemas/Room'
  */
-router.get("/", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.getAllRooms.bind(controller));
+router.get("/", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getAllRooms.bind(controller));
+
+router.get("/available", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.getAvailableRooms.bind(controller));
+
+router.get("/dirty", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getDirtyRooms.bind(controller));
 
 /**
  * @swagger
