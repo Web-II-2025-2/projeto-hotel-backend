@@ -5,11 +5,6 @@ import { EmployeeAttributes, EmployeeCreationAttributes } from "../models/Employ
 const employeeService = new EmployeeService();
 
 export class EmployeeController {
-    
-    async createEmployee(req: Request<{}, {}, EmployeeCreationAttributes>, res: Response) {
-        const employee = await employeeService.createEmployee(req.body);
-        return res.status(201).json(employee);
-    }
 
     async getEmployee(req: Request, res: Response) {
         const employee = await employeeService.getEmployee(Number(req.params.id));

@@ -2,7 +2,10 @@ import { Router } from "express";
 import { RoomController } from "../controllers/RoomController";
 import { roomCreationSchema, roomUpdateSchema} from '../schema/roomSchema';
 import { validateDTO } from '../middleware/validate.middleware';
-
+import { authenticate } from "../middleware/authMiddleware";
+import { authorize } from "../middleware/authMiddleware";
+import { RoleType } from "../enums/RoleType";
+import { AccessLevel } from "../constants/roles";
 
 
 const router = Router();
@@ -80,7 +83,7 @@ const controller = new RoomController();
  *       409:
  *         description: Este número de quarto já está sendo utilizado.
  */
-router.post("/", validateDTO(roomCreationSchema), controller.createRoom.bind(controller));
+router.post("/", authenticate, authorize(AccessLevel.EMPLOYEE), validateDTO(roomCreationSchema), controller.createRoom.bind(controller));
 
 /**
  * @swagger
@@ -98,7 +101,7 @@ router.post("/", validateDTO(roomCreationSchema), controller.createRoom.bind(con
  *               items:
  *                 $ref: '#/components/schemas/Room'
  */
-router.get("/", controller.getAllRooms.bind(controller));
+router.get("/", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.getAllRooms.bind(controller));
 
 /**
  * @swagger
@@ -123,7 +126,7 @@ router.get("/", controller.getAllRooms.bind(controller));
  *       404:
  *         description: Quarto não encontrado.
  */
-router.get("/:id", controller.getRoom.bind(controller));
+router.get("/:id", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getRoom.bind(controller));
 
 /**
  * @swagger
@@ -154,7 +157,7 @@ router.get("/:id", controller.getRoom.bind(controller));
  *       404:
  *         description: Quarto não encontrado.
  */
-router.put("/:id", validateDTO(roomUpdateSchema), controller.updateRoom.bind(controller));
+router.put("/:id", authenticate, authorize(AccessLevel.EMPLOYEE), validateDTO(roomUpdateSchema), controller.updateRoom.bind(controller));
 
 /**
  * @swagger
@@ -175,6 +178,6 @@ router.put("/:id", validateDTO(roomUpdateSchema), controller.updateRoom.bind(con
  *       404:
  *         description: Quarto não encontrado.
  */
-router.delete("/:id", controller.deleteRoom.bind(controller));
+router.delete("/:id", authenticate, authorize(AccessLevel.EMPLOYEE), controller.deleteRoom.bind(controller));
 
 export { router as roomRoutes };

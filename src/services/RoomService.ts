@@ -1,5 +1,5 @@
 import { AppError } from "../error/AppError";
-import Room, { RoomAttributes, RoomCreationAttributes } from "../models/Room";
+import {Room, RoomAttributes, RoomCreationAttributes } from "../models/Room";
 import { RoomRepository } from "../repository/RoomRepository";
 
 export class RoomService {

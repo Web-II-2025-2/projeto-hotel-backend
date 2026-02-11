@@ -1,4 +1,4 @@
-import Event, { EventCreationAttributes } from "../models/Event";
+import { Event, EventCreationAttributes } from "../models/Event";
 import { EventRepository } from "../repository/EventRepository";
 
 export class EventService {

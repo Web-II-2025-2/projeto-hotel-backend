@@ -1,5 +1,8 @@
 import { Router } from "express";
 import { EventController } from "../controllers/EventController";
+import { authenticate } from "../middleware/authMiddleware";
+import { authorize } from "../middleware/authMiddleware";
+import { AccessLevel } from "../constants/roles";
 
 const router = Router();
 const controller = new EventController();
@@ -60,7 +63,7 @@ const controller = new EventController();
  *       400:
  *         description: Erro na criação do evento.
  */
-router.post("/", controller.createEvent.bind(controller));
+router.post("/", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.createEvent.bind(controller));
 
 /**
  * @swagger
@@ -78,7 +81,7 @@ router.post("/", controller.createEvent.bind(controller));
  *               items:
  *                 $ref: '#/components/schemas/Event'
  */
-router.get("/", controller.getAllEvents.bind(controller));
+router.get("/", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.getAllEvents.bind(controller));
 
 /**
  * @swagger
@@ -103,7 +106,7 @@ router.get("/", controller.getAllEvents.bind(controller));
  *       404:
  *         description: Evento não encontrado.
  */
-router.get("/:id", controller.getEvent.bind(controller));
+router.get("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.getEvent.bind(controller));
 
 /**
  * @swagger
@@ -134,7 +137,7 @@ router.get("/:id", controller.getEvent.bind(controller));
  *       404:
  *         description: Evento não encontrado.
  */
-router.put("/:id", controller.updateEvent.bind(controller));
+router.put("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.updateEvent.bind(controller));
 
 /**
  * @swagger
@@ -155,6 +158,6 @@ router.put("/:id", controller.updateEvent.bind(controller));
  *       404:
  *         description: Evento não encontrado.
  */
-router.delete("/:id", controller.deleteEvent.bind(controller));
+router.delete("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.deleteEvent.bind(controller));
 
 export { router as eventRoutes };

@@ -58,5 +58,3 @@ Room.init(
         timestamps: false
     }
 )
-
-export default Room;
