@@ -14,13 +14,6 @@ const checkOutAfterCheckIn = (
 
 const baseReservationSchema = z.object({
   
-  userId: z.number()        
-    .int("O ID do usuário deve ser um número inteiro.")
-    .positive("O ID do usuário deve ser um valor positivo.")
-    .refine((val) => val !== undefined && val !== null, {
-      message: "O ID do usuário é obrigatório.",
-    }),
-    
   roomId: z.number()
     .int("O ID do quarto deve ser um número inteiro.")
     .positive("O ID do quarto deve ser um valor positivo.")
