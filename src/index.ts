@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import sequelize from "./config/database";
+import { createInitialAdmin } from "./config/adminSeed";
 import { setupSwagger } from "./config/swagger";
 import { guestRoutes } from "./routes/guestRoutes";
 import { roomRoutes } from "./routes/roomRoutes"; 
@@ -30,10 +31,10 @@ app.use(errorMiddleware);
 
 sequelize
   .authenticate()
-  .then(() => {
+  .then(async () => {
     console.log("Conectado ao banco de dados!");
-
-    return sequelize.sync(); 
+    await sequelize.sync();
+    await createInitialAdmin();
   })
   .then(() => {
     app.listen(PORT, () => {
