@@ -49,6 +49,18 @@ export class ReservationController {
     return res.json(reservations);
   }
 
+  async checkIn(req: Request, res: Response) {
+    const reservationId = req.params.id;
+    const credentialId = (req as any).user.id;
+
+    const result = await reservationService.markAsCheckedIn(
+      Number(reservationId),
+      credentialId,
+    );
+
+    return res.json(result);
+  }
+
   async checkout(req: Request, res: Response) {
     const reservationId = req.params.id;
     const credentialId = (req as any).user.id;

@@ -237,4 +237,11 @@ router.patch(
   controller.checkout.bind(controller),
 );
 
+router.patch(
+  "/:id/checkin",
+  authenticate,
+  authorize(AccessLevel.AUTHENTICATED),
+  controller.checkIn.bind(controller),
+);
+
 export { router as reservationRoutes };

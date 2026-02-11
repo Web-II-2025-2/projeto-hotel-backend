@@ -117,18 +117,52 @@ export class ReservationService {
         return !!conflictingReservation;
     }
 
+    async markAsCheckedIn(reservationId: number, credentialId: number): Promise<Reservation | null> {
+        const reservation = await this.getById(reservationId);
+        const guest = await this.guestService.getGuest(credentialId);
+        const room = await this.roomService.getRoom(reservation.roomId);
+        if (reservation.guestId !== guest.id) {
+             throw new AppError("Você não tem permissão para finalizar esta reserva.", 403);
+         }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const checkInDate = new Date(reservation.checkIn);
+        checkInDate.setHours(0, 0, 0, 0);
+
+        const checkOutDate = new Date(reservation.checkOut);
+        checkOutDate.setHours(23, 59, 59, 999);
+        
+        if (today < checkInDate) {
+            throw new AppError("Ainda não chegou o período permitido para o seu check-in.", 400);
+        }
+
+        if (today > checkOutDate) {
+            throw new AppError("O período desta reserva já expirou.", 400);
+        }
+
+        reservation.status = ReservationStatus.CHECKED_IN; 
+        await this.roomService.updateRoom(reservation.roomId, { 
+        ...room.get(),
+        status: RoomStatus.OCCUPIED 
+        });
+        return await this.reservationRepository.update(reservationId, reservation.get());
+    }
+
     async markAsCheckedOut(reservationId: number, credentialId: number): Promise<Reservation | null> {
         const reservation = await this.getById(reservationId);
-        const roledCredential = await this.credentialService.getCredentialById(credentialId);
+        const guest = await this.guestService.getGuest(credentialId);
         const room = await this.roomService.getRoom(reservation.roomId);
-        reservation.status = ReservationStatus.CHECKED_OUT;
-        // if (reservation.guestId !== credentialId && roledCredential.role == RoleType.GUEST) {
-        //     throw new AppError("Você não tem permissão para finalizar esta reserva.", 403);
-        // }
+        if (reservation.guestId !== guest.id) {
+             throw new AppError("Você não tem permissão para finalizar esta reserva.", 403);
+         }
         reservation.status = ReservationStatus.CHECKED_OUT;
         reservation.checkOut = new Date();
-        room.status = RoomStatus.DIRTY;
-        await this.roomService.updateRoom(reservation.roomId, room);
+        await this.roomService.updateRoom(reservation.roomId, { 
+        ...room.get(),
+        status: RoomStatus.DIRTY 
+        });
         return await this.reservationRepository.update(reservationId, reservation.get());
     }
 }
