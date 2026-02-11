@@ -122,9 +122,9 @@ export class ReservationService {
         const roledCredential = await this.credentialService.getCredentialById(credentialId);
         const room = await this.roomService.getRoom(reservation.roomId);
         reservation.status = ReservationStatus.CHECKED_OUT;
-        if (reservation.guestId !== credentialId && roledCredential.role == RoleType.GUEST) {
-            throw new AppError("Você não tem permissão para finalizar esta reserva.", 403);
-        }
+        // if (reservation.guestId !== credentialId && roledCredential.role == RoleType.GUEST) {
+        //     throw new AppError("Você não tem permissão para finalizar esta reserva.", 403);
+        // }
         reservation.status = ReservationStatus.CHECKED_OUT;
         reservation.checkOut = new Date();
         room.status = RoomStatus.DIRTY;

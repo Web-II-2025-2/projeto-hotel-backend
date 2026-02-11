@@ -1,7 +1,10 @@
 import { RequestHandler, Router } from "express";
 import { ReservationController } from "../controllers/ReservationController";
-import { validateDTO } from '../middleware/validate.middleware';
-import { reservationCreationSchema, reservationUpdateSchema } from "../schema/reservationSchema";
+import { validateDTO } from "../middleware/validate.middleware";
+import {
+  reservationCreationSchema,
+  reservationUpdateSchema,
+} from "../schema/reservationSchema";
 import { authenticate } from "../middleware/authMiddleware";
 import { authorize } from "../middleware/authMiddleware";
 import { RoleType } from "../enums/RoleType";
@@ -90,7 +93,13 @@ const controller = new ReservationController();
  *       409:
  *         description: O quarto já está ocupado nos dias escolhidos.
  */
-router.post("/", authenticate, authorize(AccessLevel.GUEST), validateDTO(reservationCreationSchema), (controller.createReservation as unknown as RequestHandler));
+router.post(
+  "/",
+  authenticate,
+  authorize(AccessLevel.GUEST),
+  validateDTO(reservationCreationSchema),
+  controller.createReservation as unknown as RequestHandler,
+);
 
 /**
  * @swagger
@@ -108,9 +117,19 @@ router.post("/", authenticate, authorize(AccessLevel.GUEST), validateDTO(reserva
  *               items:
  *                 $ref: '#/components/schemas/Reservation'
  */
-router.get("/", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getAllReservations.bind(controller));
+router.get(
+  "/",
+  authenticate,
+  authorize(AccessLevel.EMPLOYEE),
+  controller.getAllReservations.bind(controller),
+);
 
-router.get("/my-reservations", authenticate, authorize(AccessLevel.GUEST), (controller.getMyReservations as unknown as RequestHandler));
+router.get(
+  "/my-reservations",
+  authenticate,
+  authorize(AccessLevel.GUEST),
+  controller.getMyReservations as unknown as RequestHandler,
+);
 
 /**
  * @swagger
@@ -135,7 +154,12 @@ router.get("/my-reservations", authenticate, authorize(AccessLevel.GUEST), (cont
  *       404:
  *         description: Reserva não encontrada.
  */
-router.get("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.getReservation.bind(controller));
+router.get(
+  "/:id",
+  authenticate,
+  authorize(AccessLevel.AUTHENTICATED),
+  controller.getReservation.bind(controller),
+);
 
 /**
  * @swagger
@@ -169,7 +193,13 @@ router.get("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controlle
  *       404:
  *         description: Reserva não encontrada.
  */
-router.put("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), validateDTO(reservationUpdateSchema), controller.updateReservation.bind(controller));
+router.put(
+  "/:id",
+  authenticate,
+  authorize(AccessLevel.AUTHENTICATED),
+  validateDTO(reservationUpdateSchema),
+  controller.updateReservation.bind(controller),
+);
 
 /**
  * @swagger
@@ -193,6 +223,18 @@ router.put("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), validateD
  *       404:
  *         description: Reserva não encontrada.
  */
-router.delete("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.deleteReservation.bind(controller));
+router.delete(
+  "/:id",
+  authenticate,
+  authorize(AccessLevel.AUTHENTICATED),
+  controller.deleteReservation.bind(controller),
+);
+
+router.patch(
+  "/:id/checkout",
+  authenticate,
+  authorize(AccessLevel.AUTHENTICATED),
+  controller.checkout.bind(controller),
+);
 
 export { router as reservationRoutes };
