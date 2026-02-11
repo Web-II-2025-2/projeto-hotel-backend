@@ -4,14 +4,17 @@ import { Reservation, ReservationCreationAttributes } from "../models/Reservatio
 import { ReservationRepository } from "../repository/ReservationRepository";
 import { ReservationStatus } from "../enums/ReservationStatus";
 import { AppError } from "../error/AppError";
+import { CredentialService } from "./CredentialService";
+import { RoleType } from "../enums/RoleType";
+import { RoomStatus } from "../enums/RoomStatus";
 
 export class ReservationService {
 
     private roomService = new RoomService();
-
     private guestService = new GuestService();
-
     private reservationRepository = new ReservationRepository();
+    private credentialService = new CredentialService();
+
     async create(credentialId: number, data: Omit<ReservationCreationAttributes, 'guestId'>): Promise<Reservation> {
         const { roomId, checkIn, checkOut } = data;
         const checkInDate = new Date(checkIn);
@@ -89,12 +92,11 @@ export class ReservationService {
         await this.reservationRepository.delete(id);
     }
 
-    async getByGuestId(id_credential: number): Promise<Reservation[]> {
-        const guest = await this.guestService.getGuest(id_credential);
+    async getByGuestId(credentialId: number): Promise<Reservation[]> {
+        const guest = await this.guestService.getGuest(credentialId);
         if (!guest) {
             throw new AppError("Hóspede não encontrado.", 404);
         }
-
         return await this.reservationRepository.findByGuestId(guest.id);
     }
 
@@ -113,5 +115,20 @@ export class ReservationService {
             excludeReservationId
         );
         return !!conflictingReservation;
+    }
+
+    async markAsCheckedOut(reservationId: number, credentialId: number): Promise<Reservation | null> {
+        const reservation = await this.getById(reservationId);
+        const roledCredential = await this.credentialService.getCredentialById(credentialId);
+        const room = await this.roomService.getRoom(reservation.roomId);
+        reservation.status = ReservationStatus.CHECKED_OUT;
+        if (reservation.guestId !== credentialId && roledCredential.role == RoleType.GUEST) {
+            throw new AppError("Você não tem permissão para finalizar esta reserva.", 403);
+        }
+        reservation.status = ReservationStatus.CHECKED_OUT;
+        reservation.checkOut = new Date();
+        room.status = RoomStatus.DIRTY;
+        await this.roomService.updateRoom(reservation.roomId, room);
+        return await this.reservationRepository.update(reservationId, reservation.get());
     }
 }

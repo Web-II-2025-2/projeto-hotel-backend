@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import { ReservationStatus } from "../enums/ReservationStatus";
-import Reservation, { ReservationCreationAttributes, ReservationAttributes } from "../models/Reservation";
+import { Reservation, ReservationCreationAttributes, ReservationAttributes } from "../models/Reservation";
 
 export class ReservationRepository {
   
