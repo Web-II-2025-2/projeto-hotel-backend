@@ -1,6 +1,6 @@
 import { RoomService } from "./RoomService";
 import { GuestService } from "./GuestService";
-import Reservation, { ReservationCreationAttributes } from "../models/Reservation";
+import { Reservation, ReservationCreationAttributes } from "../models/Reservation";
 import { ReservationRepository } from "../repository/ReservationRepository";
 import { ReservationStatus } from "../enums/ReservationStatus";
 import { AppError } from "../error/AppError";

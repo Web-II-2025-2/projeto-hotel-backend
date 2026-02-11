@@ -1,7 +1,6 @@
 import { AppError } from "../error/AppError";
 import { AuthLoginDTO } from "../models/dtos/AuthLoginDto";
 import { AuthRegisterGuestDTO, AuthRegisterEmployeeDTO  } from "../models/dtos/AuthRegisterDto";
-import { Credential } from "../models/Credential";
 import { CredentialRepository } from "../repository/CredentialRepository";
 import { hashPassword, comparePassword, generateToken } from "../utils/auth";
 import { GuestService } from "./GuestService";

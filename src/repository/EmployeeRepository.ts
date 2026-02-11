@@ -1,4 +1,4 @@
-import Employee, { EmployeeCreationAttributes, EmployeeAttributes } from "../models/Employee";
+import { Employee, EmployeeCreationAttributes, EmployeeAttributes } from "../models/Employee";
 
 export class EmployeeRepository {
   

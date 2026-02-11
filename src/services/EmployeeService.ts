@@ -1,5 +1,5 @@
 import { AppError } from "../error/AppError";
-import Employee, { EmployeeAttributes, EmployeeCreationAttributes } from "../models/Employee";
+import { Employee, EmployeeAttributes, EmployeeCreationAttributes } from "../models/Employee";
 import { EmployeeRepository } from "../repository/EmployeeRepository";
 
 export class EmployeeService {
