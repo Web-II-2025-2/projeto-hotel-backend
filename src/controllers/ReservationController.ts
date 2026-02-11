@@ -10,7 +10,7 @@ const reservationService = new ReservationService();
 
 export class ReservationController {
   async createReservation(
-    req: Request<{}, {}, Omit<ReservationCreationAttributes, "guestId">>,
+    req: Request<{}, {}, Omit<ReservationCreationAttributes, "guestId" | "totalPrice">>,
     res: Response,
   ) {
     const credentialId = (req as any).user.id;

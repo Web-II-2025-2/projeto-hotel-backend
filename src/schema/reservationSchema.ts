@@ -31,12 +31,6 @@ const baseReservationSchema = z.object({
       message: "Formato de data de check-out inválido.",
     }),
   
-  totalPrice: z.number()
-    .positive("O preço total deve ser positivo.")
-    .refine((val) => val !== undefined && val !== null, {
-      message: "O preço total é obrigatório.",
-    }),
-  
   status: z.nativeEnum(ReservationStatus)
     .refine((val) => Object.values(ReservationStatus).includes(val), {
       message: "Status de reserva inválido.",

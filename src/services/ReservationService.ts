@@ -15,7 +15,7 @@ export class ReservationService {
     private reservationRepository = new ReservationRepository();
     private credentialService = new CredentialService();
 
-    async create(credentialId: number, data: Omit<ReservationCreationAttributes, 'guestId'>): Promise<Reservation> {
+    async create(credentialId: number, data: Omit<ReservationCreationAttributes, 'guestId' | 'totalPrice'>): Promise<Reservation> {
         const { roomId, checkIn, checkOut } = data;
         const checkInDate = new Date(checkIn);
         const checkOutDate = new Date(checkOut);
