@@ -54,7 +54,7 @@ export class AuthService {
         });
 
         return {
-            message: "Employee registered successfully"
+            message: `${role} registered successfully`
         };
     }
 

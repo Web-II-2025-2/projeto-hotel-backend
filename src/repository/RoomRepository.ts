@@ -16,7 +16,7 @@ export class RoomRepository {
 
   async updateRoom(id: number, data: RoomAttributes): Promise<Room | null> {
     const room = await Room.findByPk(id);
-    if (!room) return null; 
+    if (!room) return null;
     await room.update(data);
     return room;
   }

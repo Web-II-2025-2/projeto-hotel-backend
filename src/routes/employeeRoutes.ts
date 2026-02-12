@@ -144,4 +144,6 @@ router.put("/:id", authenticate, authorize(AccessLevel.EMPLOYEE), validateDTO(em
  */
 router.delete("/:id", authenticate, authorize(AccessLevel.MANAGER), controller.deleteEmployee.bind(controller));
 
+router.patch("/:id_room", authenticate, authorize(AccessLevel.EMPLOYEE), controller.cleanRoom.bind(controller));
+
 export { router as employeeRoutes };
