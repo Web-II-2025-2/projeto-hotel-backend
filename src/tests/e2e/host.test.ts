@@ -2,15 +2,15 @@ import request from 'supertest';
 import app from '../../app';
 import sequelize from '../../config/database';
 import { createInitialAdmin } from '../../config/adminSeed';
-import { RoleType } from '../../enums/RoleType';
-import { Room } from '../../models/Room';
 import { RoomStatus } from '../../enums/RoomStatus';
 import { RoomType } from '../../enums/RoomType';
 import { ReservationStatus } from '../../enums/ReservationStatus';
+import { clearDatabase, createAdminAndLogin, createRoom, loginGuest, registerGuest } from './helpers';
+import { create } from 'domain';
 
 describe('CT-E2E-02: Fluxo completo de hospedagem', () => {
+
   let adminToken: string;
-  let managerToken: string;
 
   const userEmail = `user_${Date.now()}@hotel.com`;
   const userPassword = 'userPassword123';
@@ -20,36 +20,12 @@ describe('CT-E2E-02: Fluxo completo de hospedagem', () => {
   const checkOut = new Date(checkIn); 
   checkOut.setDate(checkIn.getDate() + 2);
   
-
   beforeAll(async () => {
-    await sequelize.authenticate();
-    await sequelize.sync();
     await createInitialAdmin();
 
-    const adminLogin = await request(app)
-      .post('/auth/login')
-      .send({
-        email: 'adminJoseGlauber@hotel.com',
-        password: 'JoseGlauber@123',
-      });
-    adminToken = adminLogin.body;
+    adminToken = await createAdminAndLogin(app);
+    await createRoom(app, adminToken);
 
-    const roomRes = await request(app)
-      .post('/rooms')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({
-        number: 101,
-        type: RoomType.SINGLE,
-        status: RoomStatus.AVAILABLE,
-        dailyRate: 100.00
-      });
-    
-    expect(roomRes.status).toBe(201);
-
-  });
-
-  afterAll(async () => {
-    await sequelize.close();
   });
 
   it('Usuário registra-se, realiza login, faz reserva, check-in e check-out', async () => {
@@ -121,4 +97,89 @@ describe('CT-E2E-02: Fluxo completo de hospedagem', () => {
 
   });
       
+});
+
+
+describe(`CT-E2E-03: Tentativa de reserva ocupada por outro usuário,
+  usuário 1 cancela reserva e usuário 2 realiza reserva com sucesso`, () => {
+
+  let adminToken: string;
+  let roomId: number;
+  let registerRes1: any;
+  let registerRes2: any;
+
+  const user2Email = `user2_${Date.now()}@hotel.com`;
+  const user2Password = 'user2Password123';
+  const user2Cpf = '22222222222';
+  const user2PhoneNumber = '222222222';
+
+  const checkIn = new Date();
+  const checkOut = new Date(checkIn); 
+  checkOut.setDate(checkIn.getDate() + 2);
+
+  beforeAll(async () => {
+    await createInitialAdmin();
+
+    adminToken = await createAdminAndLogin(app);
+    
+    roomId = await createRoom(app, adminToken);
+
+    registerRes1 = await registerGuest(app, {});
+    registerRes2 = await registerGuest(app, {
+      email: user2Email,
+      password: user2Password,
+      cpf: user2Cpf,
+      phoneNumber: user2PhoneNumber
+    });
+
+  });
+
+  it('Usuário 1 reserva, usuário 2 tenta reservar o mesmo quarto, usuário 1 cancela e usuário 2 reserva com sucesso', async () => {
+    
+    const user1Token = await loginGuest(app, registerRes1.data.email, registerRes1.data.password);
+    const user2Token = await loginGuest(app, registerRes2.data.email, registerRes2.data.password);
+
+    const createReservationRes1 = await request(app)
+      .post('/reservations')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        roomId: roomId,
+        checkIn: checkIn,
+        checkOut: checkOut,
+        reservationStatus: ReservationStatus.CONFIRMED
+      });
+    
+    expect(createReservationRes1.status).toBe(201);
+
+    const createReservationRes2 = await request(app)
+      .post('/reservations')
+      .set('Authorization', `Bearer ${user2Token}`)
+      .send({
+        roomId: roomId,
+        checkIn: checkIn,
+        checkOut: checkOut,
+        reservationStatus: ReservationStatus.CONFIRMED
+      });
+    
+    expect(createReservationRes2.status).toBe(409);
+
+    const cancelReservationRes1 = await request(app)
+      .delete(`/reservations/${createReservationRes1.body.id}`)
+      .set('Authorization', `Bearer ${user1Token}`);
+    
+    expect(cancelReservationRes1.status).toBe(204);
+
+    const createReservationRes2Retry = await request(app)
+      .post('/reservations')
+      .set('Authorization', `Bearer ${user2Token}`)
+      .send({
+        roomId: roomId,
+        checkIn: checkIn,
+        checkOut: checkOut,
+        reservationStatus: ReservationStatus.CONFIRMED
+      });
+    
+    expect(createReservationRes2Retry.status).toBe(201);
+
+  });    
 });

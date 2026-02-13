@@ -17,8 +17,6 @@ describe(`CT-E2E-01: Permission Lifecycle, Admin promotes guest to Manager
 
   // Authenticate admin user and get token
   beforeAll(async () => {
-    await sequelize.authenticate();
-    await sequelize.sync(); 
     await createInitialAdmin();
 
     const loginRes = await request(app)
@@ -29,10 +27,6 @@ describe(`CT-E2E-01: Permission Lifecycle, Admin promotes guest to Manager
       });
     
     adminToken = loginRes.body; 
-  });
-
-  afterAll(async () => {
-    await sequelize.close();
   });
 
   it(`Should register a new guest user, this user will attempt to create a employee and fail,
