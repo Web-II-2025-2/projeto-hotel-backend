@@ -5,7 +5,7 @@ import { RoomType } from "../enums/RoomType";
 
 export interface RoomAttributes {
     id: number;
-    number: string;
+    number: number;
     type: RoomType;
     status: RoomStatus;
     dailyRate: number;
@@ -19,7 +19,7 @@ export class Room
     implements RoomAttributes
 {
     public id!: number;
-    public number!: string;
+    public number!: number;
     public type!: RoomType;
     public status!: RoomStatus;
     public dailyRate!: number;
@@ -34,7 +34,7 @@ Room.init(
             primaryKey: true
         },
         number: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
             allowNull: false,
             unique: true
         },
