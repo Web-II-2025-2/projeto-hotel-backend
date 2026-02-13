@@ -37,7 +37,7 @@ const authController = new AuthController();
  *         description: Credenciais inválidas
  */
 router.post("/login", authController.login);
-
+router.patch("/role", authenticate, authorize(AccessLevel.MANAGER), authController.updateRole);
 router.post("/register-employee", authenticate, authorize(AccessLevel.MANAGER), authController.register_employee);
 router.post("/register-manager", authenticate, authorize(AccessLevel.ADMIN), authController.register_manager);
 router.post("/register-guest", authController.register_guest);

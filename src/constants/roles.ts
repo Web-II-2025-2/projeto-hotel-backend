@@ -11,3 +11,10 @@ export const AccessLevel = {
 
   GUEST: [RoleType.GUEST],
 };
+
+export const RoleHierarchy = {
+  [RoleType.ADMIN]: 4,
+  [RoleType.MANAGER]: 3,
+  [RoleType.EMPLOYEE]: 2,
+  [RoleType.GUEST]: 1,
+};
