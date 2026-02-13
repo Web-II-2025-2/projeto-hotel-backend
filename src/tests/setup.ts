@@ -1,5 +1,20 @@
-process.env.DB_DIALECT = 'sqlite';
-process.env.DB_STORAGE = ':memory:';
-process.env.DB_USER = 'user';
-process.env.DB_PASS = 'password';
-process.env.DB_NAME = 'db';
+import sequelize from '../config/database';
+import { clearDatabase } from './e2e/helpers';
+
+beforeAll(async () => {
+  try {
+    await sequelize.authenticate();
+    await sequelize.sync({ force: true }); 
+  } catch (error) {
+    console.error('FATAL: Não foi possível iniciar o banco de testes.', error);
+    throw error;
+  }
+});
+
+afterEach(async () => {
+  await clearDatabase();
+});
+
+afterAll(async () => {
+  await sequelize.close();
+});
