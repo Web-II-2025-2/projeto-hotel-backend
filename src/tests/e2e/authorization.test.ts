@@ -68,7 +68,6 @@ describe(`CT-E2E-01: Permission Lifecycle, Admin promotes guest to Manager
         password: employeePassword
       });
 
-    console.log(createEmployeeResError.body);
     expect(createEmployeeResError.status).toBe(403);
 
     const promoteRes = await request(app)
