@@ -1,22 +1,16 @@
 import request from "supertest";
 import app from "../../app";
-import sequelize from "../../config/database";
 import { createInitialAdmin } from "../../config/adminSeed";
-import { RoomStatus } from "../../enums/RoomStatus";
-import { RoomType } from "../../enums/RoomType";
 import { ReservationStatus } from "../../enums/ReservationStatus";
 import {
-  clearDatabase,
   createAdminAndLogin,
   createReservation,
   createRoom,
   loginGuest,
-  registerEmployee,
   registerGuest,
 } from "./helpers";
-import { create } from "domain";
 
-describe("CT-E2E-02: Fluxo completo de hospedagem", () => {
+describe("CT-E2E-02: Full hosting lifecycle flow.", () => {
   let adminToken: string;
 
   const userEmail = `user_${Date.now()}@hotel.com`;
@@ -34,7 +28,7 @@ describe("CT-E2E-02: Fluxo completo de hospedagem", () => {
     await createRoom(app, adminToken);
   });
 
-  it("Usuário registra-se, realiza login, faz reserva, check-in e check-out", async () => {
+  it("should allow a guest to complete the full hospitality flow", async () => {
     const registerRes = await request(app).post("/auth/register-guest").send({
       name: "User Test",
       email: userEmail,
@@ -97,8 +91,8 @@ describe("CT-E2E-02: Fluxo completo de hospedagem", () => {
   });
 });
 
-describe(`CT-E2E-03: Tentativa de reserva ocupada por outro usuário,
-  usuário 1 cancela reserva e usuário 2 realiza reserva com sucesso`, () => {
+describe(`CT-E2E-03: Attempted reservation on an occupied room; User 1 cancels the reservation,
+  and User 2 successfully reserves the room.`, () => {
   let adminToken: string;
   let roomId: number;
   let registerRes1: any;
@@ -129,7 +123,7 @@ describe(`CT-E2E-03: Tentativa de reserva ocupada por outro usuário,
     });
   });
 
-  it("Usuário 1 reserva, usuário 2 tenta reservar o mesmo quarto, usuário 1 cancela e usuário 2 reserva com sucesso", async () => {
+  it(`Allow user2 to reserve an occupied room after user1 cancels it.`, async () => {
     const user1Token = await loginGuest(
       app,
       registerRes1.data.email,
@@ -185,7 +179,7 @@ describe(`CT-E2E-03: Tentativa de reserva ocupada por outro usuário,
   });
 });
 
-describe("CT-E2E-04: Ciclo de vida de manutenção de quarto", () => {
+describe("Room maintenance and status lifecycle.", () => {
   let adminToken: string;
   let userToken1: string;
   let userToken2: string;
@@ -229,67 +223,60 @@ describe("CT-E2E-04: Ciclo de vida de manutenção de quarto", () => {
       registerRes2.data.password,
     );
 
-    reservationRes = await createReservation(
-      app,
-      userToken1,
-      {},
-    );
+    reservationRes = await createReservation(app, userToken1, {});
   });
 
-  it(`Usuário A realiza checkin e checkout, Usuário B tenta consultar disponibilidade dos quartos mas não vê
-    o recém-liberado pois está marcado como sujo, mas após limpeza, ele consegue reservar com sucesso`, async () => {
+  it(`User A checks in and out; User B checks availability but cannot see the recently vacated room as
+    it is marked dirty; after cleaning, User B successfully reserves it.`, async () => {
+    const checkInRes = await request(app)
+      .patch(`/reservations/${reservationRes.reservationRes.body.id}/checkin`)
+      .set("Authorization", `Bearer ${userToken1}`);
 
-      const checkInRes = await request(app)
-        .patch(`/reservations/${reservationRes.reservationRes.body.id}/checkin`)
-        .set("Authorization", `Bearer ${userToken1}`);
+    expect(checkInRes.status).toBe(200);
 
-      expect(checkInRes.status).toBe(200);
+    const checkOutRes = await request(app)
+      .patch(`/reservations/${reservationRes.reservationRes.body.id}/checkout`)
+      .set("Authorization", `Bearer ${userToken1}`);
 
-      const checkOutRes = await request(app)
-        .patch(`/reservations/${reservationRes.reservationRes.body.id}/checkout`)
-        .set("Authorization", `Bearer ${userToken1}`);
+    expect(checkOutRes.status).toBe(200);
 
-      expect(checkOutRes.status).toBe(200);
+    const getAvailableRoomsRes = await request(app)
+      .get("/rooms/available")
+      .set("Authorization", `Bearer ${userToken2}`);
 
-      const getAvailableRoomsRes = await request(app)
-        .get("/rooms/available")
-        .set("Authorization", `Bearer ${userToken2}`);
+    expect(getAvailableRoomsRes.body.length).toBe(0);
 
-      expect(getAvailableRoomsRes.body.length).toBe(0);
+    const getDirtyRoomsRes = await request(app)
+      .get("/rooms/dirty")
+      .set("Authorization", `Bearer ${adminToken}`);
 
-      const getDirtyRoomsRes = await request(app)
-        .get("/rooms/dirty")
-        .set("Authorization", `Bearer ${adminToken}`);
+    expect(getDirtyRoomsRes.body.length).toBe(1);
 
-      expect(getDirtyRoomsRes.body.length).toBe(1);
+    const cleanRoomRes = await request(app)
+      .patch(`/employees/${roomId}`)
+      .set("Authorization", `Bearer ${adminToken}`);
 
-      //simplifiquei utilizando admin pois a lógica é a mesma para employees
-      const cleanRoomRes = await request(app)
-        .patch(`/employees/${roomId}`)
-        .set("Authorization", `Bearer ${adminToken}`);
+    expect(cleanRoomRes.status).toBe(200);
 
-      expect(cleanRoomRes.status).toBe(200);
+    const getAvailableRoomsResAfterCleaning = await request(app)
+      .get("/rooms/available")
+      .set("Authorization", `Bearer ${userToken2}`);
 
-      const getAvailableRoomsResAfterCleaning = await request(app)
-        .get("/rooms/available")
-        .set("Authorization", `Bearer ${userToken2}`);
+    expect(getAvailableRoomsResAfterCleaning.body.length).toBe(1);
 
-      expect(getAvailableRoomsResAfterCleaning.body.length).toBe(1);
+    checkIn.setDate(checkIn.getDate() + 5);
+    checkOut.setDate(checkOut.getDate() + 5);
 
-      checkIn.setDate(checkIn.getDate() + 5);
-      checkOut.setDate(checkOut.getDate() + 5);
+    const createReservationRes = await request(app)
+      .post("/reservations")
+      .set("Authorization", `Bearer ${userToken2}`)
+      .send({
+        roomId: roomId,
+        checkIn: checkIn,
+        checkOut: checkOut,
+        reservationStatus: ReservationStatus.CONFIRMED,
+      });
 
-      const createReservationRes = await request(app)
-        .post("/reservations")
-        .set("Authorization", `Bearer ${userToken2}`)
-        .send({
-          roomId: roomId,
-          checkIn: checkIn,
-          checkOut: checkOut,
-          reservationStatus: ReservationStatus.CONFIRMED,
-        });
-
-      expect(createReservationRes.status).toBe(201);
-
+    expect(createReservationRes.status).toBe(201);
   });
 });

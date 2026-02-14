@@ -3,8 +3,8 @@ import app from "../../app";
 import { createInitialAdmin } from "../../config/adminSeed";
 import { createAdminAndLogin, loginGuest, registerGuest } from "./helpers";
 
-describe(`CT-E2E-05: Criação de evento e usuário pede permissao para participar, quando segundo usuário
-     pedir para participar, o evento deve retornar cheio.`, () => {
+describe(`CT-E2E-05: Event creation and join request; when a second user attempts to join,
+    the event should return as full.`, () => {
   let adminToken: string;
   let registerRes1: any;
   let registerRes2: any;
@@ -26,9 +26,8 @@ describe(`CT-E2E-05: Criação de evento e usuário pede permissao para particip
     });
   });
 
-  it(`Should create an event with capacity 1, then two different users should attempt to join,
+  it(`Has a event with capacity 1, then two different users should attempt to join,
      the first should succeed and the second should fail`, async () => {
-        
     const createEventRes = await request(app)
       .post("/events")
       .set("Authorization", `Bearer ${adminToken}`)
@@ -67,6 +66,5 @@ describe(`CT-E2E-05: Criação de evento e usuário pede permissao para particip
       .set("Authorization", `Bearer ${user2Token}`);
 
     expect(joinEventRes2.status).toBe(400);
-
-    });
+  });
 });
