@@ -1,7 +1,7 @@
 import { Room, RoomAttributes, RoomCreationAttributes } from "../models/Room";
 
 export class RoomRepository {
-  async findByNumber(number: string): Promise<Room | null> {
+  async findByNumber(number: number): Promise<Room | null> {
     return await Room.findOne({ where: { number } });
   }
 

@@ -6,6 +6,7 @@ import { hashPassword, comparePassword, generateToken } from "../utils/auth";
 import { GuestService } from "./GuestService";
 import { EmployeeService } from "./EmployeeService";
 import { RoleType } from "../enums/RoleType";
+import { RoleHierarchy } from "../constants/roles";
 
 export class AuthService {
     private credentialRepository = new CredentialRepository();
@@ -76,5 +77,19 @@ export class AuthService {
         );
         return token;
     }
-}
 
+    async updateRole(targetEmail: string, newRole: RoleType, requesterId: number, requesterRole: RoleType) {
+        const targetUser = await this.credentialRepository.findByEmail(targetEmail);
+        if (!targetUser) {
+            throw new AppError("User not found", 404);
+        }
+        if (targetUser.id === requesterId) {
+            throw new AppError("You cannot change your own role", 400);
+        }
+        if (RoleHierarchy[requesterRole] <= RoleHierarchy[targetUser.role]) {
+            throw new AppError("You do not have permission to change this user's role", 403);
+        }
+        const updatedCredential = await this.credentialRepository.updateCredential(targetUser.id, {role: newRole,});
+        return updatedCredential;
+        }
+}
