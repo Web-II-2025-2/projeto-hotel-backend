@@ -7,6 +7,7 @@ import { GuestService } from "./GuestService";
 import { EmployeeService } from "./EmployeeService";
 import { RoleType } from "../enums/RoleType";
 import { RoleHierarchy } from "../constants/roles";
+import logger from "../utils/logger";
 
 export class AuthService {
     private credentialRepository = new CredentialRepository();
@@ -14,6 +15,8 @@ export class AuthService {
     private employeeService = new EmployeeService();
 
     async registerGuest(data: AuthRegisterGuestDTO) {
+
+        logger.info(`Attempting to register guest with email: ${data.email}`);
         const credentialExists = await this.credentialRepository.findByEmail(data.email);
         if (credentialExists) {
             throw new AppError("Email already in use", 409);
@@ -31,6 +34,7 @@ export class AuthService {
             credentialId: credential.id
         });
 
+        logger.info(`Guest registered successfully with email: ${data.email}`);
         return {
             message: "Guest registered successfully"
         };
@@ -39,6 +43,7 @@ export class AuthService {
 
     async registerEmployee(data: AuthRegisterEmployeeDTO, role: RoleType) {
 
+        logger.info(`Attempting to register employee with email: ${data.email}`);
         const credentialExists = await this.credentialRepository.findByEmail(data.email);
         if (credentialExists) {
             throw new AppError("Email already in use", 409);
@@ -54,12 +59,14 @@ export class AuthService {
             credentialId: credential.id
         });
 
+        logger.info(`Employee registered successfully with email: ${data.email} and role: ${role}`);
         return {
             message: `${role} registered successfully`
         };
     }
 
     async login(data: AuthLoginDTO) {
+        logger.info(`Attempting to login with email: ${data.email}`);
         const credential = await this.credentialRepository.findByEmail(data.email);
         if (!credential) {
             throw new AppError("Invalid email or password", 401);
@@ -75,10 +82,12 @@ export class AuthService {
             credential.id,
             credential.role
         );
+        logger.info(`Login successful for email: ${data.email}`);
         return token;
     }
 
     async updateRole(targetEmail: string, newRole: RoleType, requesterId: number, requesterRole: RoleType) {
+        logger.info(`Attempting to update role for user with email: ${targetEmail} to ${newRole} by requester with ID: ${requesterId} and role: ${requesterRole}`);
         const targetUser = await this.credentialRepository.findByEmail(targetEmail);
         if (!targetUser) {
             throw new AppError("User not found", 404);
@@ -90,6 +99,7 @@ export class AuthService {
             throw new AppError("You do not have permission to change this user's role", 403);
         }
         const updatedCredential = await this.credentialRepository.updateCredential(targetUser.id, {role: newRole,});
+        logger.info(`Role updated successfully for user with email: ${targetEmail} to ${newRole} by requester with ID: ${requesterId}`);
         return updatedCredential;
         }
 }

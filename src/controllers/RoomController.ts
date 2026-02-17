@@ -37,7 +37,6 @@ export class RoomController {
     async getDirtyRooms(req: Request, res: Response) {
         const rooms = await roomService.getAllRooms();
         const dirtyRooms = rooms.filter(room => room.status === RoomStatus.DIRTY);
-        console.log(dirtyRooms);
         return res.json(dirtyRooms);
     }
 
