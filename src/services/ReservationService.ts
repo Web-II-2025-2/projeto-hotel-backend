@@ -7,7 +7,7 @@ import { AppError } from "../error/AppError";
 import { CredentialService } from "./CredentialService";
 import { RoleType } from "../enums/RoleType";
 import { RoomStatus } from "../enums/RoomStatus";
-
+import logger from "../utils/logger";
 export class ReservationService {
 
     private roomService = new RoomService();
@@ -19,10 +19,13 @@ export class ReservationService {
         const { roomId, checkIn, checkOut } = data;
         const checkInDate = new Date(checkIn);
         const checkOutDate = new Date(checkOut);
+
         
         const room = await this.roomService.getRoom(roomId);
         const guest = await this.guestService.getGuest(credentialId);
-
+        
+        logger.info(`Attempting to create reservation for credential ID: ${credentialId} in room ID: ${roomId} from ${checkInDate} to ${checkOutDate}`);
+        
         const isOccupied = await this.checkIfAlreadyHasReservation(roomId, checkInDate, checkOutDate);
         if (isOccupied) {
             throw new AppError("O quarto já está ocupado nos dias escolhidos.", 409);
@@ -30,7 +33,7 @@ export class ReservationService {
 
         const totalPrice = this.calculateTotalPrice(checkInDate, checkOutDate, room.dailyRate);
 
-        return await this.reservationRepository.create({
+        const reservation = await this.reservationRepository.create({
             guestId: guest.id,
             roomId,
             checkIn: checkInDate,
@@ -38,6 +41,10 @@ export class ReservationService {
             totalPrice,
             status: ReservationStatus.CONFIRMED
         });
+
+        logger.info(`Reservation created successfully with ID: ${reservation.id} for credential ID: ${credentialId} in room ID: ${roomId} from ${checkInDate} to ${checkOutDate}`);
+        
+        return reservation;
     }
 
     async getAll(): Promise<Reservation[]> {
@@ -121,6 +128,9 @@ export class ReservationService {
         const reservation = await this.getById(reservationId);
         const guest = await this.guestService.getGuest(credentialId);
         const room = await this.roomService.getRoom(reservation.roomId);
+
+        logger.info(`Attempting to mark reservation ID: ${reservationId} as checked in for credential ID: ${credentialId}`);
+        
         if (reservation.guestId !== guest.id) {
              throw new AppError("Você não tem permissão para finalizar esta reserva.", 403);
          }
@@ -147,6 +157,8 @@ export class ReservationService {
         ...room.get(),
         status: RoomStatus.OCCUPIED 
         });
+        
+        logger.info(`Reservation ID: ${reservationId} marked as checked in for credential ID: ${credentialId}`);
         return await this.reservationRepository.update(reservationId, reservation.get());
     }
 
@@ -154,6 +166,8 @@ export class ReservationService {
         const reservation = await this.getById(reservationId);
         const guest = await this.guestService.getGuest(credentialId);
         const room = await this.roomService.getRoom(reservation.roomId);
+        
+        logger.info(`Attempting to mark reservation ID: ${reservationId} as checked out for credential ID: ${credentialId}`);  
         if (reservation.guestId !== guest.id) {
              throw new AppError("Você não tem permissão para finalizar esta reserva.", 403);
          }
@@ -163,6 +177,7 @@ export class ReservationService {
         ...room.get(),
         status: RoomStatus.DIRTY 
         });
+        logger.info(`Reservation ID: ${reservationId} marked as checked out for credential ID: ${credentialId}`);
         return await this.reservationRepository.update(reservationId, reservation.get());
     }
 }
