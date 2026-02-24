@@ -5,7 +5,6 @@ export class EventService {
     private eventRepository = new EventRepository();
 
     async create(data: EventCreationAttributes): Promise<Event> {
-        console.log(data);
         if (!data.local || !data.data || !data.horario) {
             throw new Error("Local, data e horário são obrigatórios.");
         }

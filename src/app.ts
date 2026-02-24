@@ -5,6 +5,8 @@ import { guestRoutes } from "./routes/guestRoutes";
 import { roomRoutes } from "./routes/roomRoutes"; 
 import { employeeRoutes } from "./routes/employeeRoutes";
 import { errorMiddleware } from "./middleware/errorMiddleware";
+import logger from "./utils/logger";
+import { logMiddleware } from "./middleware/logMiddleware";
 import { reservationRoutes } from "./routes/reservationRoutes";
 import { eventRoutes } from "./routes/eventRoutes";
 import authRoutes from "./routes/authRoutes";
@@ -15,6 +17,7 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
+app.use(logMiddleware);
 app.use('/auth', authRoutes);
 
 setupSwagger(app);

@@ -1,6 +1,7 @@
 import { RoleType } from "../enums/RoleType";
 import { Credential } from "../models/Credential";
 import { hashPassword } from "../utils/auth";
+import logger from "../utils/logger";
 
 export async function createInitialAdmin() {
   const exists = await Credential.findOne({
@@ -15,5 +16,5 @@ export async function createInitialAdmin() {
     role: RoleType.ADMIN,
   });
 
-  console.log("Admin inicial criado");
+  logger.info("Admin inicial criado");
 }
