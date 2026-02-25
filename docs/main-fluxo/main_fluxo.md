@@ -36,4 +36,6 @@ O nosso fluxo principal é a criação de uma reserva juntamente, desde o começ
 
 4. Disponibilidade: Verificação final mostrando que o quarto voltou ao estado "disponível".
 
-![Demonstração do Fluxo](./docs/main-fluxo/main_fluxo.webm)
+
+<video src="./main-fluxo.webm" controls="controls" width="100%">
+</video>
