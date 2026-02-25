@@ -14,6 +14,7 @@ export const generalLimiter = rateLimit({
 export const loginLimiter = rateLimit({
   windowMs: 30 * 60 * 1000,
   max: 5,
+  skipSuccessfulRequests: true,
   message: {
     status: 429,
     message: 'Too many login attempts from this IP address. Please try again after 1 hour.'
