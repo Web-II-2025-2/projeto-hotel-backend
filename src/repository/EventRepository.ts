@@ -23,4 +23,11 @@ export class EventRepository {
     async delete(id: number): Promise<void> {
         await Event.destroy({ where: { id } });
     }
+
+    async decreaseCapacity(id: number): Promise<void> {
+        const event = await Event.findByPk(id);
+        if (event) {
+            await event.decrement("capacity", { by: 1 });
+        }
+    }
 }
