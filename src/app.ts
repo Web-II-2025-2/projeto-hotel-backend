@@ -12,10 +12,14 @@ import { eventRoutes } from "./routes/eventRoutes";
 import authRoutes from "./routes/authRoutes";
 import { authenticate } from "./middleware/authMiddleware";
 import { generalLimiter } from "./config/rateLimit";
+import cors from "cors";
+import { corsOptions } from "./config/cors";
 
 dotenv.config();
 
 const app = express();
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(logMiddleware);
