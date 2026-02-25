@@ -3,9 +3,12 @@ import sequelize from "../config/database";
 
 export interface EventAttributes {
   id: number;
-  local: string;
-  horario: string; 
-  data: Date; 
+  name: string;
+  description: string;
+  date: Date;
+  time: string;
+  capacity: number;
+  location: string;
 }
 
 export interface EventCreationAttributes
@@ -16,9 +19,12 @@ export class Event
   implements EventAttributes
 {
   public id!: number;
-  public local!: string;
-  public horario!: string;
-  public data!: Date;
+  public name!: string;
+  public description!: string;
+  public date!: Date;
+  public time!: string;
+  public capacity!: number;
+  public location!: string;
 }
 
 Event.init(
@@ -26,24 +32,38 @@ Event.init(
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
-    local: {
+    name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    horario: {
-      type: DataTypes.TIME,
-      allowNull: false
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
-    data: {
+    date: {
       type: DataTypes.DATEONLY,
-      allowNull: false
-    }
+      allowNull: false,
+    },
+    time: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    capacity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
     sequelize,
     tableName: "events",
-    timestamps: false
+    timestamps: true,
   }
 );
+
+export default Event;

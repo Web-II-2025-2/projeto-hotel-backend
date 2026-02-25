@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import { EventController } from "../controllers/EventController";
 import { authenticate } from "../middleware/authMiddleware";
 import { authorize } from "../middleware/authMiddleware";
@@ -159,5 +159,7 @@ router.put("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controlle
  *         description: Evento não encontrado.
  */
 router.delete("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.deleteEvent.bind(controller));
+    
+router.post("/:id/join", authenticate, authorize(AccessLevel.AUTHENTICATED), (controller.joinEvent.bind(controller) as unknown as RequestHandler));
 
 export { router as eventRoutes };
