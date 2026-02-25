@@ -1,6 +1,6 @@
 # Fluxo de Execução
 
-O nosso fluxo principal é a criação de uma reserva juntamente, desde o começo até o check-out e o quarto voltar a ficar apto a ser reservado mais uma vez.
+O nosso fluxo principal é a criação de uma reserva juntamente, desde o começo até o check-out e o quarto voltar a ficar apto a ser reservado mais uma vez. Ao fim tem o exemplo do vídeo
 
 ## Criação das contas e Autenticação
 
@@ -36,6 +36,6 @@ O nosso fluxo principal é a criação de uma reserva juntamente, desde o começ
 
 4. Disponibilidade: Verificação final mostrando que o quarto voltou ao estado "disponível".
 
+---
 
-<video src="./main-fluxo.webm" controls="controls" width="100%">
-</video>
+[main-fluxo.webm](https://github.com/user-attachments/assets/4247f764-f0f5-404a-8e2a-210f9b4739d4)
