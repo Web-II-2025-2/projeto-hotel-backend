@@ -3,6 +3,7 @@ import { AuthController } from "../controllers/AuthController";
 import { authenticate } from "../middleware/authMiddleware";
 import { authorize } from "../middleware/authMiddleware";
 import { AccessLevel } from "../constants/roles";
+import { loginLimiter } from "../config/rateLimit";
 
 const router = express.Router();
 const authController = new AuthController();
@@ -36,10 +37,10 @@ const authController = new AuthController();
  *       401:
  *         description: Credenciais inválidas
  */
-router.post("/login", authController.login);
+router.post("/login", loginLimiter, authController.login);
 router.patch("/role", authenticate, authorize(AccessLevel.MANAGER), authController.updateRole);
 router.post("/register-employee", authenticate, authorize(AccessLevel.MANAGER), authController.register_employee);
 router.post("/register-manager", authenticate, authorize(AccessLevel.ADMIN), authController.register_manager);
-router.post("/register-guest", authController.register_guest);
+router.post("/register-guest", loginLimiter, authController.register_guest);
 
 export default router;

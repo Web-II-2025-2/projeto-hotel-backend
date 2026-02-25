@@ -11,6 +11,7 @@ import { reservationRoutes } from "./routes/reservationRoutes";
 import { eventRoutes } from "./routes/eventRoutes";
 import authRoutes from "./routes/authRoutes";
 import { authenticate } from "./middleware/authMiddleware";
+import { generalLimiter } from "./config/rateLimit";
 
 dotenv.config();
 
@@ -18,6 +19,9 @@ const app = express();
 
 app.use(express.json());
 app.use(logMiddleware);
+
+app.use(generalLimiter);
+
 app.use('/auth', authRoutes);
 
 setupSwagger(app);
