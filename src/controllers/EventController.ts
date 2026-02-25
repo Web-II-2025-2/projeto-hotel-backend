@@ -33,5 +33,9 @@ export class EventController {
         return res.status(204).send();
     }
 
+    async joinEvent(req: UserAuthRequest, res: Response) {
+        const event =await eventService.joinEvent(Number(req.params.id), Number(req.user.id));
+        return res.status(200).json(event);
+    }
 
 }
