@@ -1,219 +1,117 @@
-# Documento de Testes Ponta a Ponta (E2E)
-## Sistema de Gestão Hoteleira
+# Documento de Testes End-to-End (E2E)
+**Sistema de Gestão de Hóteis**
+
+Este documento descreve os cenários de testes end-to-end responsáveis por validar os fluxos críticos do sistema, incluindo autenticação, permissões, reservas, eventos e manutenção de quartos.
 
 ---
 
-## 1. Objetivo
+## CT-E2E-01: Ciclo de Permissões – Promoção de Usuário
 
-Este documento descreve os **cenários de testes ponta a ponta (End-to-End)** do Sistema de Hotel.
+### Descrição
+Valida o fluxo onde um usuário guest tenta executar uma ação restrita, falha por permissão insuficiente, é promovido a manager e passa a executar a ação com sucesso.
 
-Os testes E2E têm como objetivo validar **fluxos completos de negócio**, garantindo que múltiplos módulos do sistema funcionem corretamente de forma integrada, simulando o comportamento real dos usuários (hóspedes, funcionários e gerentes).
+### Pré-condições
+- Administrador inicial criado no sistema  
 
----
+### Fluxo
+1. Registrar um novo usuário guest  
+2. Autenticar como guest  
+3. Guest tenta registrar um employee e falha por não ter permissão
+4. Administrador promove o guest para MANAGER  
+5. Autenticar novamente como manager  
+6. Manager registra com sucesso um employee 
 
-## 2. Escopo dos Testes
-
-Os testes E2E cobrem:
-
-- Autenticação e autorização
-- Gestão de usuários, funcionários e hóspedes
-- Controle de papéis e permissões (RBAC)
-- Reservas e alocação de quartos
-- Eventos e serviços
-- Checkout e fluxo operacional de limpeza
-- Cancelamentos e liberação de recursos
-
----
-
-## 3. Papéis do Sistema (Roles)
-
-- **Hóspede**
-- **Funcionário**
-- **Gerente**
-- **Admin**
+### Pós-condições
+- Usuário promovido possui permissões de manager 
 
 ---
 
-## 4. Cenários de Teste Ponta a Ponta
+## CT-E2E-02: Ciclo Completo de Hospedagem
+
+### Descrição
+Valida o fluxo principal de negócio: consulta de quartos disponíveis, criação de reserva, check-in, check-out e verificação de quartos sujos.
+
+### Pré-condições
+- Administrador autenticado  
+- Pelo menos um quarto criado  
+
+### Fluxo
+1. Registrar usuário guest  
+2. Autenticar como guest  
+3. Consultar quartos disponíveis 
+4. Criar reserva 
+5. Realizar check-in → Status CHECKED_IN 
+6. Realizar check-out → Status CHECKED_OUT
+7. Administrador consulta quartos sujos e o quarto recém desocupado aparece 
+
+### Pós-condições
+- Reserva finalizada  
+- Quarto marcado como DIRTY  
 
 ---
 
-### CT-E2E-01 — Atribuição do papel de gerente a um usuário
+## CT-E2E-03: Reserva em Quarto Ocupado
 
-**Objetivo:**  
-Validar o fluxo de cadastro e atribuição de credencial de gerente a um usuário.
+### Descrição
+Garante que o sistema impeça reservas concorrentes em um mesmo quarto e período, liberando-o após cancelamento.
 
-**Pré-condições:**
-- Admin criado no sistema
+### Pré-condições
+- Administrador autenticado  
+- Quarto criado  
+- Dois usuários guest registrados  
 
-**Fluxo:**
-1. Usuário realiza registro
-2. Admin atribui o papel de gerente ao usuário
+### Fluxo
+1. Usuário 1 cria reserva  
+2. Usuário 2 tenta reservar mesmo quarto/período e falha por conflito
+3. Usuário 1 cancela reserva 
+4. Usuário 2 tenta novamente e deve ter sucesso 
 
-**Pós-condições:**
-- Usuário possui papel de gerente
-- Alteração de papel registrada no sistema
-
----
-
-### CT-E2E-02 — Criação de quarto por gerente
-
-**Objetivo:**  
-Validar a criação de quartos por um gerente.
-
-**Pré-condições:**
-- Usuário criado e com credencial de gerente
-
-**Fluxo:**
-1. Gerente realiza login
-2. Gerente cria um novo quarto
-
-**Pós-condições:**
-- Quarto persistido no sistema
-- Quarto com status definido no momento de criação
+### Pós-condições
+- Reserva válida associada ao Usuário 2  
 
 ---
 
-### CT-E2E-03 — Cadastro de funcionário com aprovação do gerente
+## CT-E2E-04: Ciclo de Status e Limpeza de Quarto
 
-**Objetivo:**  
-Garantir que funcionários só possam ser cadastrados mediante aprovação de um gerente ou papel superior.
+### Descrição
+Valida as transições de estado do quarto após checkout e o fluxo de limpeza.
 
-**Pré-condições:**
-- Gerente autenticado no sistema
+### Pré-condições
+- Administrador autenticado 
+- Quarto criado  
+- Dois usuários guest registrados  
+- Reserva ativa para Usuário 1  
 
-**Fluxo:**
-1. Usuário cadastra-se
-2. Gerente confere a credencial de funcionário ao usuário
-3. Gerente define o papel inicial do funcionário
+### Fluxo
+1. Usuário 1 realiza check-in  
+2. Usuário 1 realiza check-out  
+3. Usuário 2 consulta quartos disponíveis e não deve ter o quarto sujo
+4. Administrador consulta quartos sujos  
+5. Administrador limpa quarto
+6. Usuário 2 consulta quartos disponíveis e deve ter o quarto recém-limpo
+7. Usuário 2 cria reserva 
 
-**Pós-condições:**
-- Funcionário registrado no sistema
-- Funcionário com papel atribuído
-
----
-
-### CT-E2E-04 — Registro de hóspede e criação de reserva aceita por um funcionário
-
-**Objetivo:**  
-Validar o fluxo completo de reserva por um hóspede.
-
-**Pré-condições:**
-- Quarto disponível
-- Hóspede não registrado previamente
-
-**Fluxo:**
-1. Hóspede se registra
-2. Hóspede realiza login
-3. Consulta disponibilidade
-4. Cria reserva válida
-5. Funcionário confirma reserva
-
-**Pós-condições:**
-- Reserva registrada no sistema
-- Reserva associada ao hóspede
-- Quarto com status "Reservado"
+### Pós-condições
+- Quarto disponível para novas reservas  
+- Nova reserva criada  
 
 ---
 
-### CT-E2E-05 — Tentativa de reserva em período indisponível
+## CT-E2E-05: Evento Lotado
 
-**Objetivo:**  
-Impedir reservas conflitantes.
+### Descrição
+Valida o controle de capacidade de eventos, impedindo inscrições além do limite.
 
-**Pré-condições:**
-- Quarto já reservado no período solicitado
+### Pré-condições
+- Administrador autenticado  
+- Dois usuários guest registrados  
 
-**Fluxo:**
-1. Hóspede realiza login
-2. Tenta criar reserva para período indisponível
+### Fluxo
+1. Criar evento com capacidade = 1 
+2. Usuário 1 participa   
+3. Usuário 2 tenta participar e falha por lotação  
 
-**Pós-condições:**
-- Nenhuma nova reserva criada
-- Estado do quarto permanece inalterado
-
----
-
-### CT-E2E-06 — Participação de hóspede em evento
-
-**Objetivo:**  
-Validar inscrição de hóspede em evento.
-
-**Pré-condições:**
-- Evento ativo e com capacidade disponível
-
-**Fluxo:**
-1. Hóspede realiza login
-2. Consulta eventos disponíveis
-3. Realiza inscrição
-4. Funcionário ou credencial maior aceita inscrição
-
-**Pós-condições:**
-- Hóspede associado ao evento
-- Vagas do evento atualizadas
-
----
-
-### CT-E2E-07 — Alocação de serviço 
-
-**Objetivo:**  
-Validar prestação de serviços a um quarto.
-
-**Pré-condições:**
-- Funcionário prestador cadastrado
-- Gerente autenticado
-- Quarto ativo
-
-**Fluxo:**
-1. Prestador solicita alocação de serviço
-2. Status do quarto é atualizado
-
-**Pós-condições:**
-- Serviço associado ao quarto
-
----
-
-### CT-E2E-08 — Checkout e fluxo automático de limpeza
-
-**Objetivo:**  
-Garantir rapidez e disponibilidade do quarto após checkout.
-
-**Pré-condições:**
-- Reserva ativa associada a um quarto
-
-**Fluxo:**
-1. Hóspede realiza checkout
-2. Sistema altera o quarto para "DIRTY"
-3. É solicitado a um funcionário limpar o quarto
-
-**Pós-condições:**
-- Reserva finalizada
-- Quarto com status atualizado
-
----
-
-### CT-E2E-09 — Cancelamento de reserva e liberação do quarto
-
-**Objetivo:**  
-Garantir liberação de recursos após cancelamento.
-
-**Pré-condições:**
-- Reserva válida dentro do prazo permitido
-
-**Fluxo:**
-1. Hóspede cancela reserva
-
-**Pós-condições:**
-- Reserva cancelada
-- Quarto liberado para novas reservas
-
----
-
-## 5. Critérios de Aceitação
-
-- Fluxos devem respeitar autenticação e autorização
-- Papéis devem ser validados em todas as operações sensíveis
-- Estados do sistema devem permanecer consistentes
-- Nenhuma operação crítica deve gerar dados inválidos
+### Pós-condições
+- Evento com capacidade esgotada  
 
 ---
