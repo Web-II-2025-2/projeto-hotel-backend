@@ -24,7 +24,12 @@ This project is a RESTful API developed in **Node.js** with **TypeScript** for h
 
 ## API Documentation (Swagger)
 
-Interactive documentation for all endpoints, including input schemas (JSON) and response examples, is available via Swagger UI.
+The project's API is documented through two primary methods:
+
+1. Static Documentation:
+[Documentation](./Api-docs.md)
+
+2. Interactive documentation:
 
 After starting the server, access it in your browser at:
 > **http://localhost:3000/api-docs**
