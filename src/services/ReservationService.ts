@@ -31,7 +31,7 @@ export class ReservationService {
             throw new AppError("O quarto já está ocupado nos dias escolhidos.", 409);
         }
 
-        const totalPrice = this.calculateTotalPrice(checkInDate, checkOutDate, roomId);
+        const totalPrice = await this.calculateTotalPrice(checkInDate, checkOutDate, roomId);
 
         const reservation = await this.reservationRepository.create({
             guestId: guest.id,
@@ -82,7 +82,7 @@ export class ReservationService {
 
             const room = await this.roomService.getRoom(reservation.roomId);
 
-            reservation.totalPrice = this.calculateTotalPrice(newCheckIn, newCheckOut, room.dailyRate);
+            reservation.totalPrice = await this.calculateTotalPrice(newCheckIn, newCheckOut, reservation.roomId);
         }
 
         if (data.guestId) reservation.guestId = data.guestId;
