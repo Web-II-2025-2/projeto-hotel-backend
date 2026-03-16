@@ -24,18 +24,10 @@ export class RoomService {
     return room;
   }
 
-  async updateRoom(id: number, data: RoomAttributes): Promise<Room | null> {
-    const roomAlreadyExists = await this.roomRepository.findByNumber(
-      data.number,
-    );
-
-    if (roomAlreadyExists && roomAlreadyExists.id !== id) {
-      throw new AppError("Este número de quarto já está sendo utilizado.", 409);
-    }
-
-    const room = await this.roomRepository.updateRoom(id, data);
-    if (!room) throw new AppError("Room not found", 404);
-    return room;
+  async updateRoom(id: number, data: Partial<RoomAttributes>): Promise<Room | null> {
+    const room = await Room.findByPk(id);
+    if (!room) return null;
+    return await room.update(data); 
   }
 
   async getAllRooms(): Promise<Room[]> {

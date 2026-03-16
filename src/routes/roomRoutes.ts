@@ -130,7 +130,7 @@ router.get("/dirty", authenticate, authorize(AccessLevel.EMPLOYEE), controller.g
  *       404:
  *         description: Quarto não encontrado.
  */
-router.get("/:id", authenticate, authorize(AccessLevel.EMPLOYEE), controller.getRoom.bind(controller));
+router.get("/:id", authenticate, authorize(AccessLevel.AUTHENTICATED), controller.getRoom.bind(controller));
 
 /**
  * @swagger

@@ -147,13 +147,13 @@ export class ReservationService {
         const checkOutDate = new Date(reservation.checkOut);
         checkOutDate.setHours(23, 59, 59, 999);
         
-        if (today < checkInDate) {
-            throw new AppError("Ainda não chegou o período permitido para o seu check-in.", 400);
-        }
+        // if (today < checkInDate) {
+        //     throw new AppError("Ainda não chegou o período permitido para o seu check-in.", 400);
+        // }
 
-        if (today > checkOutDate) {
-            throw new AppError("O período desta reserva já expirou.", 400);
-        }
+        // if (today > checkOutDate) {
+        //     throw new AppError("O período desta reserva já expirou.", 400);
+        // }
 
         reservation.status = ReservationStatus.CHECKED_IN; 
         await this.roomService.updateRoom(reservation.roomId, { 
