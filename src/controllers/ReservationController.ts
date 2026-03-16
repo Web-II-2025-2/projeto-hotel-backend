@@ -10,7 +10,11 @@ const reservationService = new ReservationService();
 
 export class ReservationController {
   async createReservation(
-    req: Request<{}, {}, Omit<ReservationCreationAttributes, "guestId" | "totalPrice">>,
+    req: Request<
+      {},
+      {},
+      Omit<ReservationCreationAttributes, "guestId" | "totalPrice">
+    >,
     res: Response,
   ) {
     const credentialId = (req as any).user.id;
@@ -71,5 +75,15 @@ export class ReservationController {
     );
 
     return res.json(result);
+  }
+
+  async estimatePrice(req: Request, res: Response) {
+    const { checkIn, checkOut, roomId } = req.body;
+    const result = await reservationService.calculateTotalPrice(
+      new Date(checkIn),
+      new Date(checkOut),
+      Number(roomId),
+    );
+    return res.json({ totalPrice: result });
   }
 }

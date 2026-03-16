@@ -244,4 +244,11 @@ router.patch(
   controller.checkIn.bind(controller),
 );
 
+router.post(
+  "/estimate-price",
+  authenticate,
+  authorize(AccessLevel.AUTHENTICATED),
+  controller.estimatePrice.bind(controller),
+)
+
 export { router as reservationRoutes };

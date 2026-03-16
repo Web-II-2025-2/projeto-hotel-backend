@@ -31,7 +31,7 @@ export class ReservationService {
             throw new AppError("O quarto já está ocupado nos dias escolhidos.", 409);
         }
 
-        const totalPrice = this.calculateTotalPrice(checkInDate, checkOutDate, room.dailyRate);
+        const totalPrice = this.calculateTotalPrice(checkInDate, checkOutDate, roomId);
 
         const reservation = await this.reservationRepository.create({
             guestId: guest.id,
@@ -107,11 +107,14 @@ export class ReservationService {
         return await this.reservationRepository.findByGuestId(guest.id);
     }
 
-    private calculateTotalPrice(checkIn: Date, checkOut: Date, dailyRate: number): number {
+    public async calculateTotalPrice(checkIn: Date, checkOut: Date, roomId: number): Promise<number> {
+        const room = await this.roomService.getRoom(roomId);
+        
         const diffTime = Math.abs(checkOut.getTime() - checkIn.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         const daysToCharge = diffDays === 0 ? 1 : diffDays;
-        return daysToCharge * dailyRate;
+        
+        return daysToCharge * room.dailyRate;
     }
 
     private async checkIfAlreadyHasReservation(roomId: number, checkIn: Date, checkOut: Date, excludeReservationId?: number): Promise<boolean> {
