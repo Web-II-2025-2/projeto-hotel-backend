@@ -10,10 +10,11 @@ export interface ReservationAttributes {
     checkOut: Date;
     totalPrice: number;
     status: ReservationStatus;
+    isCleaningRequested?: boolean; 
 }
 
 export interface ReservationCreationAttributes
-    extends Optional<ReservationAttributes, "id" | "status"> {}
+    extends Optional<ReservationAttributes, "id" | "status" | "isCleaningRequested"> {}
 
 export class Reservation
     extends Model<ReservationAttributes, ReservationCreationAttributes>
@@ -26,6 +27,7 @@ export class Reservation
     public checkOut!: Date;
     public totalPrice!: number;
     public status!: ReservationStatus;
+    public isCleaningRequested?: boolean;
 }
 
 Reservation.init(
@@ -38,18 +40,12 @@ Reservation.init(
         guestId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-                model: 'guests', 
-                key: 'id'
-            }
+            references: { model: 'guests', key: 'id' }
         },
         roomId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-                model: 'rooms', 
-                key: 'id'
-            }
+            references: { model: 'rooms', key: 'id' }
         },
         checkIn: {
             type: DataTypes.DATE,
@@ -66,6 +62,11 @@ Reservation.init(
         status: {
             type: DataTypes.ENUM(...Object.values(ReservationStatus)),
             defaultValue: ReservationStatus.CONFIRMED
+        },
+        isCleaningRequested: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         }
     },
     {

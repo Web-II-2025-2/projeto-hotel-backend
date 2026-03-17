@@ -14,7 +14,6 @@ import { authenticate } from "./middleware/authMiddleware";
 import { generalLimiter } from "./config/rateLimit";
 import cors from "cors";
 import { corsOptions } from "./config/cors";
-import { roomServiceRoutes } from "./routes/roomServiceRoutes";
 
 dotenv.config();
 
@@ -36,7 +35,6 @@ app.use("/rooms", roomRoutes);
 app.use("/employees", employeeRoutes);
 app.use("/reservations", reservationRoutes);
 app.use("/events", eventRoutes);
-app.use("/service", roomServiceRoutes);
 app.use(errorMiddleware); 
 
 export default app;
