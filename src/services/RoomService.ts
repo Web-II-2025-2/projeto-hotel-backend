@@ -1,30 +1,36 @@
+import { RoomStatus } from "../enums/RoomStatus";
+import { RoomType } from "../enums/RoomType";
 import { AppError } from "../error/AppError";
-import Room, { RoomAttributes, RoomCreationAttributes } from "../models/Room";
+import { Room, RoomAttributes, RoomCreationAttributes } from "../models/Room";
 import { RoomRepository } from "../repository/RoomRepository";
 
 export class RoomService {
   private roomRepository = new RoomRepository();
 
-  async createRoom (data: RoomCreationAttributes): Promise<Room> {
-    const roomAlreadyExists = await this.roomRepository.findByNumber(data.number);
+  async createRoom(data: RoomCreationAttributes): Promise<Room> {
+    const roomAlreadyExists = await this.roomRepository.findByNumber(
+      data.number,
+    );
 
     if (roomAlreadyExists) {
-      throw new AppError('Este número de quarto já está sendo utilizado.', 409);
+      throw new AppError("Este número de quarto já está sendo utilizado.", 409);
     }
     return await this.roomRepository.createRoom(data);
   }
 
-  async getRoom(id: number): Promise<Room>  {
+  async getRoom(id: number): Promise<Room> {
     const room = await this.roomRepository.getRoom(id);
-    if (!room) throw new AppError('room not found.', 404);
+    if (!room) throw new AppError("room not found.", 404);
     return room;
   }
-  
+
   async updateRoom(id: number, data: RoomAttributes): Promise<Room | null> {
-    const roomAlreadyExists = await this.roomRepository.findByNumber(data.number);
+    const roomAlreadyExists = await this.roomRepository.findByNumber(
+      data.number,
+    );
 
     if (roomAlreadyExists && roomAlreadyExists.id !== id) {
-      throw new AppError('Este número de quarto já está sendo utilizado.', 409);
+      throw new AppError("Este número de quarto já está sendo utilizado.", 409);
     }
 
     const room = await this.roomRepository.updateRoom(id, data);
@@ -40,5 +46,16 @@ export class RoomService {
     const deleted = await this.roomRepository.deleteRoom(id);
     if (!deleted) throw new AppError("Room not found", 404);
     return true;
+  }
+
+  async cleanRoom(roomId: number) {
+    const room = await this.getRoom(roomId);
+    if (room.status !== RoomStatus.DIRTY) {
+        throw new AppError("Este quarto não está marcado para limpeza.", 400);
+    }
+    return await this.updateRoom(roomId, { 
+        ...room.get(),
+        status: RoomStatus.AVAILABLE 
+        });
   }
 }

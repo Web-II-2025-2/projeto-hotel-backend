@@ -1,40 +1,50 @@
 import { RoomService } from "./RoomService";
-import { UserService } from "./UserService";
-import Reservation, { ReservationCreationAttributes } from "../models/Reservation";
+import { GuestService } from "./GuestService";
+import { Reservation, ReservationCreationAttributes } from "../models/Reservation";
 import { ReservationRepository } from "../repository/ReservationRepository";
 import { ReservationStatus } from "../enums/ReservationStatus";
 import { AppError } from "../error/AppError";
-
+import { CredentialService } from "./CredentialService";
+import { RoleType } from "../enums/RoleType";
+import { RoomStatus } from "../enums/RoomStatus";
+import logger from "../utils/logger";
 export class ReservationService {
 
     private roomService = new RoomService();
-
-    private userService = new UserService();
-
+    private guestService = new GuestService();
     private reservationRepository = new ReservationRepository();
-    async create(data: ReservationCreationAttributes): Promise<Reservation> {
-        const { userId, roomId, checkIn, checkOut } = data;
+    private credentialService = new CredentialService();
+
+    async create(credentialId: number, data: Omit<ReservationCreationAttributes, 'guestId' | 'totalPrice'>): Promise<Reservation> {
+        const { roomId, checkIn, checkOut } = data;
         const checkInDate = new Date(checkIn);
         const checkOutDate = new Date(checkOut);
+
         
         const room = await this.roomService.getRoom(roomId);
-        const user = await this.userService.getUser(userId);
-
+        const guest = await this.guestService.getGuest(credentialId);
+        
+        logger.info(`Attempting to create reservation for credential ID: ${credentialId} in room ID: ${roomId} from ${checkInDate} to ${checkOutDate}`);
+        
         const isOccupied = await this.checkIfAlreadyHasReservation(roomId, checkInDate, checkOutDate);
         if (isOccupied) {
             throw new AppError("O quarto já está ocupado nos dias escolhidos.", 409);
         }
 
-        const totalPrice = this.calculateTotalPrice(checkInDate, checkOutDate, room.dailyRate);
+        const totalPrice = await this.calculateTotalPrice(checkInDate, checkOutDate, roomId);
 
-        return await this.reservationRepository.create({
-            userId,
+        const reservation = await this.reservationRepository.create({
+            guestId: guest.id,
             roomId,
             checkIn: checkInDate,
             checkOut: checkOutDate,
             totalPrice,
             status: ReservationStatus.CONFIRMED
         });
+
+        logger.info(`Reservation created successfully with ID: ${reservation.id} for credential ID: ${credentialId} in room ID: ${roomId} from ${checkInDate} to ${checkOutDate}`);
+        
+        return reservation;
     }
 
     async getAll(): Promise<Reservation[]> {
@@ -72,10 +82,10 @@ export class ReservationService {
 
             const room = await this.roomService.getRoom(reservation.roomId);
 
-            reservation.totalPrice = this.calculateTotalPrice(newCheckIn, newCheckOut, room.dailyRate);
+            reservation.totalPrice = await this.calculateTotalPrice(newCheckIn, newCheckOut, reservation.roomId);
         }
 
-        if (data.userId) reservation.userId = data.userId;
+        if (data.guestId) reservation.guestId = data.guestId;
         
         reservation.checkIn = newCheckIn;
         reservation.checkOut = newCheckOut;
@@ -89,11 +99,22 @@ export class ReservationService {
         await this.reservationRepository.delete(id);
     }
 
-    private calculateTotalPrice(checkIn: Date, checkOut: Date, dailyRate: number): number {
+    async getByGuestId(credentialId: number): Promise<Reservation[]> {
+        const guest = await this.guestService.getGuest(credentialId);
+        if (!guest) {
+            throw new AppError("Hóspede não encontrado.", 404);
+        }
+        return await this.reservationRepository.findByGuestId(guest.id);
+    }
+
+    public async calculateTotalPrice(checkIn: Date, checkOut: Date, roomId: number): Promise<number> {
+        const room = await this.roomService.getRoom(roomId);
+        
         const diffTime = Math.abs(checkOut.getTime() - checkIn.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         const daysToCharge = diffDays === 0 ? 1 : diffDays;
-        return daysToCharge * dailyRate;
+        
+        return daysToCharge * room.dailyRate;
     }
 
     private async checkIfAlreadyHasReservation(roomId: number, checkIn: Date, checkOut: Date, excludeReservationId?: number): Promise<boolean> {
@@ -104,5 +125,62 @@ export class ReservationService {
             excludeReservationId
         );
         return !!conflictingReservation;
+    }
+
+    async markAsCheckedIn(reservationId: number, credentialId: number): Promise<Reservation | null> {
+        const reservation = await this.getById(reservationId);
+        const guest = await this.guestService.getGuest(credentialId);
+        const room = await this.roomService.getRoom(reservation.roomId);
+
+        logger.info(`Attempting to mark reservation ID: ${reservationId} as checked in for credential ID: ${credentialId}`);
+        
+        if (reservation.guestId !== guest.id) {
+             throw new AppError("Você não tem permissão para finalizar esta reserva.", 403);
+         }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const checkInDate = new Date(reservation.checkIn);
+        checkInDate.setHours(0, 0, 0, 0);
+
+        const checkOutDate = new Date(reservation.checkOut);
+        checkOutDate.setHours(23, 59, 59, 999);
+        
+        if (today < checkInDate) {
+            throw new AppError("Ainda não chegou o período permitido para o seu check-in.", 400);
+        }
+
+        if (today > checkOutDate) {
+            throw new AppError("O período desta reserva já expirou.", 400);
+        }
+
+        reservation.status = ReservationStatus.CHECKED_IN; 
+        await this.roomService.updateRoom(reservation.roomId, { 
+        ...room.get(),
+        status: RoomStatus.OCCUPIED 
+        });
+        
+        logger.info(`Reservation ID: ${reservationId} marked as checked in for credential ID: ${credentialId}`);
+        return await this.reservationRepository.update(reservationId, reservation.get());
+    }
+
+    async markAsCheckedOut(reservationId: number, credentialId: number): Promise<Reservation | null> {
+        const reservation = await this.getById(reservationId);
+        const guest = await this.guestService.getGuest(credentialId);
+        const room = await this.roomService.getRoom(reservation.roomId);
+        
+        logger.info(`Attempting to mark reservation ID: ${reservationId} as checked out for credential ID: ${credentialId}`);  
+        if (reservation.guestId !== guest.id) {
+             throw new AppError("Você não tem permissão para finalizar esta reserva.", 403);
+         }
+        reservation.status = ReservationStatus.CHECKED_OUT;
+        reservation.checkOut = new Date();
+        await this.roomService.updateRoom(reservation.roomId, { 
+        ...room.get(),
+        status: RoomStatus.DIRTY 
+        });
+        logger.info(`Reservation ID: ${reservationId} marked as checked out for credential ID: ${credentialId}`);
+        return await this.reservationRepository.update(reservationId, reservation.get());
     }
 }

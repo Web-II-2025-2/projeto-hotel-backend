@@ -5,11 +5,6 @@ import { EmployeeAttributes, EmployeeCreationAttributes } from "../models/Employ
 const employeeService = new EmployeeService();
 
 export class EmployeeController {
-    
-    async createEmployee(req: Request<{}, {}, EmployeeCreationAttributes>, res: Response) {
-        const employee = await employeeService.createEmployee(req.body);
-        return res.status(201).json(employee);
-    }
 
     async getEmployee(req: Request, res: Response) {
         const employee = await employeeService.getEmployee(Number(req.params.id));
@@ -29,5 +24,11 @@ export class EmployeeController {
     async deleteEmployee(req: Request, res: Response) {
         await employeeService.deleteEmployee(Number(req.params.id));
         return res.status(204).send();
+    }
+
+    async cleanRoom(req: Request<{ id_room: string }>, res: Response) {
+        const roomId = Number(req.params.id_room);
+        await employeeService.cleanRoom(roomId);
+        return res.status(200).json({ message: `Quarto ${roomId} limpo com sucesso.` });
     }
 }

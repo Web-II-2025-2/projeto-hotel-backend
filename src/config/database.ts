@@ -1,10 +1,13 @@
-import { Sequelize } from "sequelize";
+import { Sequelize, Dialect } from "sequelize";
 import dotenv from "dotenv";
 
 dotenv.config();
 
+const dbDialect = (process.env.DB_DIALECT || "postgres") as Dialect;
+
 const sequelize = new Sequelize({
-  dialect: process.env.DB_DIALECT as "postgres" | "mysql",
+  dialect: dbDialect,
+  storage: process.env.DB_STORAGE || ":memory:",
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   username: process.env.DB_USER,

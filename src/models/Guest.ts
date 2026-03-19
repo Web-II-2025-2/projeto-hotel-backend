@@ -1,30 +1,30 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "../config/database";
 
-export interface UserAttributes {
+export interface GuestAttributes {
   id: number;
   name: string;
-  email: string;
   cpf: string;
   phoneNumber: string;
+  credentialId: number;
 }
 
-export interface UserCreationAttributes
-  extends Optional<UserAttributes, "id"> {}
+export interface GuestCreationAttributes
+  extends Optional<GuestAttributes, "id"> {}
 
-export class User
-  extends Model<UserAttributes, UserCreationAttributes>
-  implements UserAttributes
+export class Guest
+  extends Model<GuestAttributes, GuestCreationAttributes>
+  implements GuestAttributes
 {
   public id!: number;
   public name!: string;
-  public email!: string;
   public cpf!: string;
   public phoneNumber!: string;
+  public credentialId!: number;
 }
 
 
-User.init(
+Guest.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -35,11 +35,6 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
-    },
     cpf: {
       type: DataTypes.STRING,
       allowNull: false
@@ -48,11 +43,21 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false
     },
+    credentialId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      unique: true,
+      references: {
+        model: "credentials",
+        key: "id"
+      },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE"
+    }
   },
   {
     sequelize,
-    tableName: "users",
+    tableName: "guests",
     timestamps: false
   }
 );
-

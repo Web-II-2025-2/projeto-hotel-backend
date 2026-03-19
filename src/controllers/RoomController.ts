@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { RoomService } from "../services/RoomService";
 import { RoomCreationAttributes, RoomAttributes } from "../models/Room";
+import { RoomStatus } from "../enums/RoomStatus";
 
 const roomService = new RoomService();
 
@@ -25,6 +26,18 @@ export class RoomController {
         const rooms = await roomService.getAllRooms();
         return res.json(rooms);
 
+    }
+
+    async getAvailableRooms(req: Request, res: Response) {
+        const rooms = await roomService.getAllRooms();
+        const availableRooms = rooms.filter(room => room.status === RoomStatus.AVAILABLE);
+        return res.json(availableRooms);
+    }
+
+    async getDirtyRooms(req: Request, res: Response) {
+        const rooms = await roomService.getAllRooms();
+        const dirtyRooms = rooms.filter(room => room.status === RoomStatus.DIRTY);
+        return res.json(dirtyRooms);
     }
 
     async deleteRoom(req: Request, res: Response) {

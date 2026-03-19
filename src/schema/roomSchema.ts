@@ -4,7 +4,7 @@ import { RoomStatus } from "../enums/RoomStatus";
 
 
 export const roomCreationSchema = z.object({
-  number: z.string().min(1, "O número do quarto é obrigatório."),
+  number: z.number().min(1, "O número do quarto é obrigatório."),
 
   type: z.nativeEnum(RoomType)
     .refine((val) => Object.values(RoomType).includes(val), {

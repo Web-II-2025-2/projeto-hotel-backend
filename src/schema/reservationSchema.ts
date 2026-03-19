@@ -14,13 +14,6 @@ const checkOutAfterCheckIn = (
 
 const baseReservationSchema = z.object({
   
-  userId: z.number()        
-    .int("O ID do usuário deve ser um número inteiro.")
-    .positive("O ID do usuário deve ser um valor positivo.")
-    .refine((val) => val !== undefined && val !== null, {
-      message: "O ID do usuário é obrigatório.",
-    }),
-    
   roomId: z.number()
     .int("O ID do quarto deve ser um número inteiro.")
     .positive("O ID do quarto deve ser um valor positivo.")
@@ -36,12 +29,6 @@ const baseReservationSchema = z.object({
   checkOut: z.coerce.date()
     .refine((val) => val instanceof Date && !isNaN(val.getTime()), {
       message: "Formato de data de check-out inválido.",
-    }),
-  
-  totalPrice: z.number()
-    .positive("O preço total deve ser positivo.")
-    .refine((val) => val !== undefined && val !== null, {
-      message: "O preço total é obrigatório.",
     }),
   
   status: z.nativeEnum(ReservationStatus)

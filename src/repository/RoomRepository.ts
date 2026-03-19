@@ -1,7 +1,7 @@
 import { Room, RoomAttributes, RoomCreationAttributes } from "../models/Room";
 
 export class RoomRepository {
-  async findByNumber(number: string): Promise<Room | null> {
+  async findByNumber(number: number): Promise<Room | null> {
     return await Room.findOne({ where: { number } });
   }
 
@@ -16,7 +16,7 @@ export class RoomRepository {
 
   async updateRoom(id: number, data: RoomAttributes): Promise<Room | null> {
     const room = await Room.findByPk(id);
-    if (!room) return null; 
+    if (!room) return null;
     await room.update(data);
     return room;
   }
